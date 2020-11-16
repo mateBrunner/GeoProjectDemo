@@ -1,0 +1,60 @@
+﻿@page "/kompetenciak"
+
+@using GeoProjectDemo.Data
+@inject KompetenciaService KompetenciaService
+
+<div class="pageContent">
+
+    @*<h2>Kompetenciák</h2>*@
+
+    @*<div style="background-color:blue"></div>*@
+
+    @if ( Dolgozok == null )
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+
+        <TelerikGrid Data="@Dolgozok" class="kompetencia-grid smallerFont"
+                     Resizable="true"
+                     Pageable="false" Sortable="true" Reorderable="false"                     
+                     EditMode="@GridEditMode.Inline"
+                     FilterMode="Telerik.Blazor.GridFilterMode.FilterMenu">
+            <GridColumns>
+                <GridColumn Title="Név" Field="Nev" Width="100px" Locked="true"/>
+                @foreach ( var komp in OsszesKompetencia )
+                {
+                <GridColumn Field="Kompetenciak" Title="@komp.Nev" 
+                            Width="100px" Filterable="true" Sortable="true">
+                    <Template Context="dolgozo">
+                    @{
+                        Kompetencia dolgKomp = ( dolgozo as Dolgozo ).Kompetenciak
+                            .Where( k => k.Azonosito == komp.Azonosito ).FirstOrDefault( );
+                        string res = dolgKomp == null ? "" : dolgKomp.SzintNev;
+                        <p class="gridText">@res</p>
+                    }
+                    </Template>
+                </GridColumn>
+                }
+            </GridColumns>
+        </TelerikGrid>
+    }
+</div>
+
+@code {
+    private List<Dolgozo> Dolgozok;
+    private List<Kompetencia> OsszesKompetencia;
+    private long SelectedKompetenciaId;
+
+    protected override async Task OnAfterRenderAsync( bool first )
+    {
+        if ( !first )
+            return;
+
+        OsszesKompetencia = await KompetenciaService.GetKompetenciakAsync( );
+        Dolgozok = await KompetenciaService.GetDolgozokAsync( );
+
+        StateHasChanged( );
+    }
+}
