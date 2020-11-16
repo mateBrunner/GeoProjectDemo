@@ -1,6 +1,8 @@
 ﻿@page "/kompetenciak"
 
 @using GeoProjectDemo.Data
+@using System.Dynamic
+@using Telerik.DataSource 
 @inject KompetenciaService KompetenciaService
 
 <div class="pageContent">
@@ -16,45 +18,159 @@
     else
     {
 
+        @*<TelerikGrid Data="@Dolgozok" class="kompetencia-grid smallerFont"
+                         Resizable="true"
+                         Pageable="false" Sortable="true" Reorderable="false"
+                         EditMode="@GridEditMode.Inline"
+                         FilterMode="Telerik.Blazor.GridFilterMode.FilterMenu">
+                <GridColumns>
+                    <GridColumn Title="Név" Field="Nev" Width="100px" Locked="true"/>
+                    @foreach ( var komp in OsszesKompetencia )
+                    {
+                    <GridColumn Field="Kompetenciak" Title="@komp.Nev"
+                                Width="100px" Filterable="true" Sortable="true">
+                        <Template Context="dolgozo">
+                        @{
+                            Kompetencia dolgKomp = ( dolgozo as Dolgozo ).Kompetenciak
+                                .Where( k => k.Azonosito == komp.Azonosito ).FirstOrDefault( );
+                            string res = dolgKomp == null ? "" : dolgKomp.SzintNev;
+                            <p class="gridText">@res</p>
+                        }
+                        </Template>
+                    </GridColumn>
+                    }
+                </GridColumns>
+            </TelerikGrid>*@
+
         <TelerikGrid Data="@Dolgozok" class="kompetencia-grid smallerFont"
                      Resizable="true"
-                     Pageable="false" Sortable="true" Reorderable="false"                     
+                     Pageable="false" Sortable="true" Reorderable="false"
                      EditMode="@GridEditMode.Inline"
                      FilterMode="Telerik.Blazor.GridFilterMode.FilterMenu">
             <GridColumns>
-                <GridColumn Title="Név" Field="Nev" Width="100px" Locked="true"/>
+                <GridColumn Title="Név" Field="Nev" FieldType="typeof(string)" Width="100px" Locked="true" />
+                <GridColumn Title="Azonosito" Field="Azonosito" FieldType="typeof(string)" Width="100px" />
                 @foreach ( var komp in OsszesKompetencia )
                 {
-                <GridColumn Field="Kompetenciak" Title="@komp.Nev" 
+                <GridColumn Field="@komp" FieldType="typeof(string)" Title="@komp"
                             Width="100px" Filterable="true" Sortable="true">
-                    <Template Context="dolgozo">
+                    <FilterMenuTemplate>
                     @{
-                        Kompetencia dolgKomp = ( dolgozo as Dolgozo ).Kompetenciak
-                            .Where( k => k.Azonosito == komp.Azonosito ).FirstOrDefault( );
-                        string res = dolgKomp == null ? "" : dolgKomp.SzintNev;
-                        <p class="gridText">@res</p>
+                        // we store a reference to the filter context to use in the business logic to show we can
+                        // we could, alternatively pass it as an argument to the event handler in the lambda expression
+                        // which can be useful if you want to use the same filter for several columns
+                        // you could then pass more arguments to the business logic such as field name and so on
+                        theFilterContext[komp] = context;
                     }
-                    </Template>
+
+                    @foreach ( var szint in Szintek )
+                    {
+                        <div>
+                            <TelerikCheckBox Value="@(IsCheckboxInCurrentFilter(context.FilterDescriptor, szint))"
+                                             TValue="bool"
+                                             ValueChanged="@((value) => UpdateCheckedSizes(value, szint, komp))"
+                                             Id="@($"szint_{szint}")">
+                            </TelerikCheckBox>
+                            <label for="@($"szint_{szint}")">
+                                @szint
+                            </label>
+                        </div>
+                    }
+                    </FilterMenuTemplate>
                 </GridColumn>
                 }
             </GridColumns>
         </TelerikGrid>
+
     }
 </div>
 
 @code {
-    private List<Dolgozo> Dolgozok;
-    private List<Kompetencia> OsszesKompetencia;
-    private long SelectedKompetenciaId;
+    //private List<Dolgozo> Dolgozok;
+    //private List<Kompetencia> OsszesKompetencia;
+    //private long SelectedKompetenciaId;
+
+    //protected override async Task OnAfterRenderAsync( bool first )
+    //{
+    //    if ( !first )
+    //        return;
+
+    //    OsszesKompetencia = await KompetenciaService.GetKompetenciakAsync( );
+    //    Dolgozok = await KompetenciaService.GetDolgozokAsync( );
+
+    //    StateHasChanged( );
+    //}
+
+    Dictionary<string, FilterMenuTemplateContext> theFilterContext { get; set; }
+    Dictionary<string, List<string>> checkedSizes { get; set; }
+
+    public string[] Szintek = new string[] { "nincs", "0. nem releváns", "1. nincs", "2. kezdő", "3. gyakorlott", "4. szakértő", "5. jedi" };
+    //public string[] Szintek = new string[] { "A", "B", "C", "2. kezdő", "E", "F", "G" };
+
+    private List<ExpandoObject> Dolgozok;
+    private List<string> OsszesKompetencia;
+    //private long SelectedKompetenciaId;
 
     protected override async Task OnAfterRenderAsync( bool first )
     {
         if ( !first )
             return;
 
-        OsszesKompetencia = await KompetenciaService.GetKompetenciakAsync( );
-        Dolgozok = await KompetenciaService.GetDolgozokAsync( );
+        OsszesKompetencia = await KompetenciaService.GetKompetenciaNevek( );
+        theFilterContext = new Dictionary<string, FilterMenuTemplateContext>( );
+        checkedSizes = new Dictionary<string, List<string>>( );
+        OsszesKompetencia.ForEach( x => {
+            theFilterContext.Add( x, new FilterMenuTemplateContext( ) );
+            checkedSizes.Add( x, new List<string>( ) );
+        } );
+
+        Dolgozok = await KompetenciaService.GetDynamics( );
 
         StateHasChanged( );
     }
+
+
+
+    public bool IsCheckboxInCurrentFilter( CompositeFilterDescriptor filterDescriptor, string size )
+    {
+        var a = filterDescriptor.FilterDescriptors.Select( f => ( f as FilterDescriptor ).Value?.ToString( ) ).ToList( );
+        // get all current filter descriptors and evaluate whether to select the current checkbox
+        return filterDescriptor.FilterDescriptors.Select( f => ( f as FilterDescriptor ).Value?.ToString( ) ).ToList( ).Contains( size );
+    }
+
+    public void UpdateCheckedSizes( bool value, string itemValue, string komp )
+    {
+        // update the list of items we want to filter by
+        var isSizeChecked = checkedSizes[ komp ].Contains( itemValue );
+        if ( value && !isSizeChecked )
+        {
+            checkedSizes[ komp ].Add( itemValue );
+        }
+
+        if ( !value && isSizeChecked )
+        {
+            checkedSizes[ komp ].Remove( itemValue );
+        }
+
+        // prepare filter descriptor
+        var filterDescriptor = theFilterContext[ komp ].FilterDescriptor;
+
+        filterDescriptor.FilterDescriptors.Clear( );
+        // use the OR logical operator so we include all possible values
+        filterDescriptor.LogicalOperator = FilterCompositionLogicalOperator.Or;
+        checkedSizes[ komp ].ForEach( s =>
+            // instantiate a filter descriptor for the desired field, and with the desired operator and value
+            filterDescriptor.FilterDescriptors.Add( new FilterDescriptor( komp, FilterOperator.IsEqualTo, s ) )
+        );
+
+        //ensure there is at least one blank filter to avoid null reference exceptions
+        if ( !filterDescriptor.FilterDescriptors.Any( ) )
+        {
+            filterDescriptor.FilterDescriptors.Add( new FilterDescriptor( ) );
+        }
+    }
+
+
+
+
 }

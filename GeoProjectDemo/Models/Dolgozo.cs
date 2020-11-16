@@ -13,4 +13,6 @@ namespace GeoProjectDemo.Models
         public List<Kompetencia> Kompetenciak { get; set; } = new List<Kompetencia>( );
 
     }
+
+
 }
