@@ -1,0 +1,51 @@
+﻿@page "/"
+@inject NavigationManager navigationManager
+@inject WindowsAuthentication winAuth
+@inject WinAuthStateProvider stateProvider
+@using GeoProjectDemo.Globals
+@using System.Security.Principal;
+
+<h1>Login</h1>
+
+<TelerikTextBox @bind-Value="FelhasznaloNev" Label="Felhasználó">
+</TelerikTextBox>
+
+<TelerikTextBox @bind-Value="Jelszo" Label="Jelszó">
+</TelerikTextBox>
+
+<TelerikButton @onclick="Bejelentkezes">Bejelentkezés</TelerikButton>
+
+Welcome to your new app.
+
+@code {
+
+    public string FelhasznaloNev { get; set; }
+
+    public string Jelszo { get; set; }
+
+
+    public void Bejelentkezes( )
+    {
+        var a = System.Environment.MachineName;
+        var b = WindowsIdentity.GetCurrent( ).Name;
+
+        string name = "mbrunner";
+        string domain = "GEO";
+        string password = "asdf";
+
+        IntPtr tokenHandle = IntPtr.Zero;
+
+        var isSuccess = WindowsAuthentication.LogonUser( name, domain, pw, 2, 0, ref tokenHandle );
+
+        if ( isSuccess )
+        {
+            winAuth.LoginUser( new User( ) { Nev = name } );
+            navigationManager.NavigateTo( "menu" );
+        }
+
+
+    }
+
+
+
+}

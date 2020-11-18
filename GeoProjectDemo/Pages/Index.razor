@@ -1,7 +1,6 @@
-﻿@page "/"
+﻿@page "/menu"
+@attribute [Authorize( Roles = "testRoleee" )]
 
-<h1>Hello, world!</h1>
+<h1>Ide jön majd a menü</h1>
 
 Welcome to your new app.
-
-<SurveyPrompt Title="How is Blazor working for you?" />

@@ -2,7 +2,8 @@
 
 @using GeoProjectDemo.Data
 @using System.Dynamic
-@using Telerik.DataSource 
+@using Telerik.DataSource
+@using System.Text;
 @inject KompetenciaService KompetenciaService
 
 <div class="pageContent">
@@ -50,39 +51,38 @@
             <GridColumns>
                 <GridColumn Title="Név" Field="Nev" FieldType="typeof(string)" Width="100px" Locked="true" />
                 <GridColumn Title="Azonosito" Field="Azonosito" FieldType="typeof(string)" Width="100px" />
-                @foreach ( var komp in OsszesKompetencia )
+                @foreach ( var komp in KompetenciaByProp.Keys )
                 {
-                <GridColumn Field="@komp" FieldType="typeof(string)" Title="@komp"
-                            Width="100px" Filterable="true" Sortable="true">
-                    <FilterMenuTemplate>
-                    @{
-                        // we store a reference to the filter context to use in the business logic to show we can
-                        // we could, alternatively pass it as an argument to the event handler in the lambda expression
-                        // which can be useful if you want to use the same filter for several columns
-                        // you could then pass more arguments to the business logic such as field name and so on
-                        theFilterContext[komp] = context;
-                    }
+                    <GridColumn Field="@komp" FieldType="typeof(string)" Title="@KompetenciaByProp[komp].Nev"
+                                Width="100px" Filterable="true" Sortable="true">
+                        <FilterMenuTemplate>
+                            @{
+                                // we store a reference to the filter context to use in the business logic to show we can
+                                // we could, alternatively pass it as an argument to the event handler in the lambda expression
+                                // which can be useful if you want to use the same filter for several columns
+                                // you could then pass more arguments to the business logic such as field name and so on
+                                theFilterContext[ komp ] = context;
+                            }
 
-                    @foreach ( var szint in Szintek )
-                    {
-                        <div>
-                            <TelerikCheckBox Value="@(IsCheckboxInCurrentFilter(context.FilterDescriptor, szint))"
-                                             TValue="bool"
-                                             ValueChanged="@((value) => UpdateCheckedSizes(value, szint, komp))"
+                            @foreach ( var szint in Szintek )
+                            {
+                                <div>
+                                    <TelerikCheckBox Value="@(IsCheckboxInCurrentFilter(context.FilterDescriptor, szint))"
+                                                     TValue="bool"
+                                                     ValueChanged="@((value) => UpdateCheckedSizes(value, szint, komp))"
                                              Id="@($"szint_{szint}")">
-                            </TelerikCheckBox>
-                            <label for="@($"szint_{szint}")">
-                                @szint
-                            </label>
-                        </div>
-                    }
-                    </FilterMenuTemplate>
-                </GridColumn>
+                                    </TelerikCheckBox>
+                                    <label for=" @($"szint_{szint}")">
+                                        @szint
+                                    </label>
+                                </div>
+                            }
+                        </FilterMenuTemplate>
+                    </GridColumn>
                 }
-            </GridColumns>
-        </TelerikGrid>
+            </GridColumns></TelerikGrid>
 
-    }
+     }
 </div>
 
 @code {
@@ -104,27 +104,29 @@
     Dictionary<string, FilterMenuTemplateContext> theFilterContext { get; set; }
     Dictionary<string, List<string>> checkedSizes { get; set; }
 
-    public string[] Szintek = new string[] { "nincs", "0. nem releváns", "1. nincs", "2. kezdő", "3. gyakorlott", "4. szakértő", "5. jedi" };
+    public List<string> Szintek; //= new string[] { "nincs", "0nem releváns", "1nincs", "kezdo2", "3 gyakorlott", "4szakértő", "5jedi" };
     //public string[] Szintek = new string[] { "A", "B", "C", "2. kezdő", "E", "F", "G" };
 
     private List<ExpandoObject> Dolgozok;
-    private List<string> OsszesKompetencia;
-    //private long SelectedKompetenciaId;
+    public Dictionary<string, Kompetencia> KompetenciaByProp { get; set; } = new Dictionary<string, Kompetencia>( );
 
     protected override async Task OnAfterRenderAsync( bool first )
     {
         if ( !first )
             return;
 
-        OsszesKompetencia = await KompetenciaService.GetKompetenciaNevek( );
+        var res = await KompetenciaService.GetAdatok( );
+        Szintek = res.Szintek;
+        KompetenciaByProp = res.KompetenciaByProp;
+        Dolgozok = res.Dolgozok;
+
         theFilterContext = new Dictionary<string, FilterMenuTemplateContext>( );
         checkedSizes = new Dictionary<string, List<string>>( );
-        OsszesKompetencia.ForEach( x => {
+        KompetenciaByProp.Keys.ToList().ForEach( x =>
+        {
             theFilterContext.Add( x, new FilterMenuTemplateContext( ) );
             checkedSizes.Add( x, new List<string>( ) );
         } );
-
-        Dolgozok = await KompetenciaService.GetDynamics( );
 
         StateHasChanged( );
     }
@@ -173,4 +175,4 @@
 
 
 
-}
+    }
