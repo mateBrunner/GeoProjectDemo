@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Server.IIS;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components.Authorization;
 using GeoProjectDemo.Globals;
+using Blazored.SessionStorage;
 
 namespace GeoProjectDemo
 {
@@ -31,13 +32,10 @@ namespace GeoProjectDemo
             services.AddServerSideBlazor( );
             services.AddSingleton<KompetenciaService>( );
 
-
-            services.AddAuthentication( IISServerDefaults.AuthenticationScheme );
+            services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>( );
+            services.AddBlazoredSessionStorage( );
             services.AddAuthorization( );
 
-            services.AddSingleton<WindowsAuthentication>( );
-            services.AddSingleton<IClaimsTransformation, ClaimsTransformationService>( );
-            services.AddSingleton<AuthenticationStateProvider, WinAuthStateProvider>( );
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

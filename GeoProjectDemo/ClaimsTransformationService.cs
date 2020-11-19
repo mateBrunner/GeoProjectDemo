@@ -14,12 +14,9 @@ namespace GeoProjectDemo
     public class ClaimsTransformationService : IClaimsTransformation
     {
 
-        private WindowsAuthentication m_winAuth;
-
         #region Constructor
-        public ClaimsTransformationService( WindowsAuthentication winAuth )
+        public ClaimsTransformationService( )
         {
-            m_winAuth = winAuth;
         }
         #endregion
 
@@ -31,17 +28,7 @@ namespace GeoProjectDemo
             ClaimsIdentity claimsIdentity = (ClaimsIdentity)principal.Identity;
 
             var windowsUser = (WindowsIdentity)principal.Identity;
-            string userName = windowsUser.Name.Split( '\\' )[ 1 ];
-
-            var user = m_winAuth.GetLoggedInUser( userName );
-
-            if ( user == null || !IsInGroup( windowsUser, "GEO\\Domain Users" ) )
-                return Task.FromResult( principal );
-
-            foreach ( Claim claim in user.Claims )
-                if ( !claimsIdentity.Claims.Contains( claim ) )
-                    claimsIdentity.AddClaim( claim );
-
+            
             return Task.FromResult( principal );
 
         }

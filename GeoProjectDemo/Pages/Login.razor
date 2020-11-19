@@ -1,11 +1,20 @@
 ﻿@page "/"
 @inject NavigationManager navigationManager
-@inject WindowsAuthentication winAuth
-@inject WinAuthStateProvider stateProvider
+@inject AuthenticationStateProvider authStateProvider
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @using GeoProjectDemo.Globals
 @using System.Security.Principal;
 
 <h1>Login</h1>
+
+<AuthorizeView>
+    <Authorized>
+        <p>Welcome, @context.User.Identity.Name</p>
+    </Authorized>
+    <NotAuthorized>
+        <p>not authorized</p>
+    </NotAuthorized>
+</AuthorizeView>
 
 <TelerikTextBox @bind-Value="FelhasznaloNev" Label="Felhasználó">
 </TelerikTextBox>
@@ -26,22 +35,27 @@ Welcome to your new app.
 
     public void Bejelentkezes( )
     {
-        var a = System.Environment.MachineName;
-        var b = WindowsIdentity.GetCurrent( ).Name;
+        (authStateProvider as CustomAuthStateProvider).LogInUser( "mate" );
+        navigationManager.NavigateTo( "menu" );
 
-        string name = "mbrunner";
-        string domain = "GEO";
-        string password = "asdf";
+        sessionStorage.SetItemAsync( "username", "mate" );
 
-        IntPtr tokenHandle = IntPtr.Zero;
+        //var a = System.Environment.MachineName;
+        //var b = WindowsIdentity.GetCurrent( ).Name;
 
-        var isSuccess = WindowsAuthentication.LogonUser( name, domain, pw, 2, 0, ref tokenHandle );
+        //string name = "mbrunner";
+        //string domain = "GEO";
+        //string password = "asdf";
 
-        if ( isSuccess )
-        {
-            winAuth.LoginUser( new User( ) { Nev = name } );
-            navigationManager.NavigateTo( "menu" );
-        }
+        //IntPtr tokenHandle = IntPtr.Zero;
+
+        //var isSuccess = WindowsAuthentication.LogonUser( name, domain, password, 2, 0, ref tokenHandle );
+
+        //if ( isSuccess )
+        //{
+        //    winAuth.LoginUser( new User( ) { Nev = name } );
+        //    navigationManager.NavigateTo( "menu" );
+        //}
 
 
     }
