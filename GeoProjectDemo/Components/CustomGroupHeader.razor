@@ -1,0 +1,99 @@
+﻿@using System.Text
+
+
+<div class=@sbHead style="@CustomGroupStyle">
+    @ColumnGroupName
+</div>
+
+<br />
+
+<div class=@sbSubHead>
+    @ColumnName
+</div>
+
+<style>
+    .aquip-k-grid-group-head-base {
+        margin-left: -12px;
+        margin-right: -12px;
+        margin-top: -8px;
+        margin-bottom: -10px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+        background: inherit;
+        color: transparent;
+    }
+
+    .aquip-k-grid-group-head-first {
+        border-left-color: inherit;
+        border-left-style: solid;
+        border-left-width: 1px;
+        border-color: rgba(0, 0, 0, 0.08);
+        color: inherit;
+        text-align: start;
+        padding-left: 12px;
+    }
+
+    .aquip-k-grid-group-underhead-base {
+        margin-left: -12px;
+        margin-right: -12px;
+        margin-top: -10px;
+        margin-bottom: -8px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+        padding-left: 12px;
+        border-top-color: inherit;
+        border-top-style: solid;
+        border-top-width: 1px;
+        border-left-color: inherit;
+        border-left-style: solid;
+        border-left-width: 1px;
+        border-color: rgba(0, 0, 0, 0.08);
+        background: inherit;
+        color: inherit;
+    }
+
+    .aquip-k-grid-group-underhead-ungrouped {
+        border-top-color: transparent;
+    }
+
+    .k-grid th {
+        border-left-style: none;
+    }
+</style>
+
+
+@code {
+    [Parameter]
+    public bool IsFirst { get; set; } = false;
+
+    [Parameter]
+    public bool IsGrouped { get; set; } = true;
+
+    [Parameter]
+    public string ColumnGroupName { get; set; }
+
+    [Parameter]
+    public string ColumnName { get; set; }
+
+    StringBuilder sbHead = new StringBuilder( );
+    StringBuilder sbSubHead = new StringBuilder( );
+
+    private string HeadBaseCSS = "aquip-k-grid-group-head-";
+    private string HeadBaseUnderCSS = "aquip-k-grid-group-underhead-";
+    private string CustomGroupStyle;
+
+    // head-title-odd, head-title-even, head-first, underhead-ungrouped
+    protected override void OnInitialized( )
+    {
+
+        sbHead.Append( HeadBaseCSS + "base " );
+        sbSubHead.Append( HeadBaseUnderCSS + "base " );
+
+        //Head
+        if ( IsFirst ) { sbHead.Append( HeadBaseCSS + "first " ); }
+
+        //subHead
+        if ( IsGrouped == false ) { sbSubHead.Append( HeadBaseUnderCSS + "ungrouped " ); }
+
+    }
+}

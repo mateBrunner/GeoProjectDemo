@@ -5,30 +5,17 @@ using System.Threading.Tasks;
 
 namespace GeoProjectDemo.Models
 {
-    public class Kompetencia : IComparable<Kompetencia>
+    public class Kompetencia
     {
 
         public long Azonosito { get; set; }
+        public string PropertyNev { get; set; }
         public string Nev { get; set; }
-        public long? CsoportAzonosito { get; set; }
+        public long? KategoriaAzonosito { get; set; }
         public long Szint { get; set; }
         public string SzintNev { get; set; }
-
-        public int CompareTo( Kompetencia other )
-        {
-            if ( this.Szint < other.Szint )
-            {
-                return 1;
-            }
-            else if ( this.Szint > other.Szint )
-            {
-                return -1;
-            }
-            else
-            {
-                return 0;
-            }
-        }
+        public bool IsFirstInGroup { get; set; } = false;
+        public bool IsVisible { get; set; } = true;
 
 
     }

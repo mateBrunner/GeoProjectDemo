@@ -1,8 +1,12 @@
-﻿<CascadingAuthenticationState>
-    <Router AppAssembly="@typeof(Program).Assembly">
+﻿@inject SessionService sessionService
+@inject IJSRuntime jsRuntime
+@implements IDisposable
+
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof( Program ).Assembly">
         <Found Context="routeData">
             @*A DefaultLayout-tal adunk meg layout-ot olyan komponensnek, aminek amúgy nincs*@
-            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof( MainLayout )">
                 <NotAuthorized>
                     <h1>Bejelentkezés szükséges</h1>
                     <p>Jelentkezz be a menü eléréséhez!</p>
@@ -15,9 +19,28 @@
             </AuthorizeRouteView>
         </Found>
         <NotFound>
-            <LayoutView Layout="@typeof(MainLayout)">
+            <LayoutView Layout="@typeof( MainLayout )">
                 <p>Itt nincs semmi</p>
             </LayoutView>
         </NotFound>
     </Router>
 </CascadingAuthenticationState>
+
+@code {
+
+    protected override async Task OnAfterRenderAsync( bool first )
+    {
+
+        var a = 0;
+        string res = await jsRuntime.InvokeAsync<string>( "getBrowserInfo", "asdf" );
+        var b = 0;
+        //string windowsUser = await sessionService.GetHash( jsRuntime );
+        //var b = 0;
+    }
+
+    public void Dispose( )
+    {
+        var a = 0;
+    }
+
+}

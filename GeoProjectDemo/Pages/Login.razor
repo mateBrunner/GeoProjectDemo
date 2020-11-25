@@ -1,9 +1,6 @@
 ﻿@page "/"
 @inject NavigationManager navigationManager
 @inject AuthenticationStateProvider authStateProvider
-@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
-@using GeoProjectDemo.Globals
-@using System.Security.Principal;
 
 <h1>Login</h1>
 
@@ -33,33 +30,18 @@ Welcome to your new app.
     public string Jelszo { get; set; }
 
 
-    public void Bejelentkezes( )
+    public async void Bejelentkezes( )
     {
-        (authStateProvider as CustomAuthStateProvider).LogInUser( "mate" );
+
+        ( authStateProvider as CustomAuthStateProvider ).LogInUser( "mate" );
         navigationManager.NavigateTo( "menu" );
-
-        sessionStorage.SetItemAsync( "username", "mate" );
-
-        //var a = System.Environment.MachineName;
-        //var b = WindowsIdentity.GetCurrent( ).Name;
-
-        //string name = "mbrunner";
-        //string domain = "GEO";
-        //string password = "asdf";
-
-        //IntPtr tokenHandle = IntPtr.Zero;
-
-        //var isSuccess = WindowsAuthentication.LogonUser( name, domain, password, 2, 0, ref tokenHandle );
-
-        //if ( isSuccess )
-        //{
-        //    winAuth.LoginUser( new User( ) { Nev = name } );
-        //    navigationManager.NavigateTo( "menu" );
-        //}
-
 
     }
 
+    protected override async Task OnAfterRenderAsync( bool first )
+    {
+        var a = 0;
+    }
 
 
 }

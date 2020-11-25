@@ -36,34 +36,51 @@ namespace GeoProjectDemo.Data
             Dictionary<int, string> szintDict = new Dictionary<int, string>( );
             foreach ( KodtablaAdatok szint in szintek )
                 szintDict.Add( szint.Azonosito, Encoding.UTF8.GetString( Encoding.Default.GetBytes( szint.Ertek ) ) );
-            szintDict.Add( 0, "nincs" );
+            szintDict.Add( 0, "NA" );
 
             result.Szintek = szintDict.Values.ToList( );
 
+            //Kompetenciacsoportok összegyûjtése
+            var csoportok = kodtablaAdatok.Adatok.Where( k => k.KodTipus == "KOMPETENCIA_CSOPORT" );
+            result.Kategoriak = csoportok.Select( c => new KompetenciaKategoria( )
+            {
+                Azonosito = c.Azonosito,
+                Nev = c.Ertek
+            } ).ToList( );
 
             //kompetenciák összegyûjtése
-            var komps = kodtablaAdatok.Adatok.Where( k => k.KodTipus == "KOMPETENCIA" );
-            Dictionary<int, string> kompDict = new Dictionary<int, string>( );
-            int kompCounter = 0;
-            foreach ( KodtablaAdatok komp in komps )
+            List<Kompetencia> komps = kodtablaAdatok.Adatok.Where( k => k.KodTipus == "KOMPETENCIA" )
+                .OrderBy( k => k.SzuloKodAzonosito )
+                .Select( k => new Kompetencia( )
+                {
+                    Azonosito = k.Azonosito,
+                    Nev = k.Ertek,
+                    KategoriaAzonosito = k.SzuloKodAzonosito
+                } ).ToList( );
+            komps[ 0 ].IsFirstInGroup = true;
+            komps[ 0 ].PropertyNev = "KompProp0";
+            for (int i = 1; i < komps.Count; i++ )
             {
-                string propName = $"KompProp{kompCounter++}";
-                kompDict.Add( komp.Azonosito, propName );
-                result.KompetenciaByProp.Add( propName, new Kompetencia( ) { Azonosito = komp.Azonosito, Nev = komp.Ertek } );
+                komps[ i ].PropertyNev = $"KompProp{i}";
+                if ( komps[ i ].KategoriaAzonosito != komps[ i - 1 ].KategoriaAzonosito )
+                    komps[ i ].IsFirstInGroup = true;
             }
+
+            Dictionary<string, Kompetencia> kompDict = new Dictionary<string, Kompetencia>( );
+            komps.ForEach( k => kompDict.Add( k.PropertyNev, k ) );
+            result.Kompetenciak = komps;
 
             //Dolgozók összegyûjtése
             foreach ( Dolgozok dolg in dolgozokRes.Dolgozok )
             {
                 var current = new ExpandoObject( );// as IDictionary<string, object>;
                 
-                //current.Add( "Nev", dolg.Nev );
-                //current.Add( "Azonosito", dolg.Azonosito );
-                foreach ( int kompAzon in kompDict.Keys )
+                current.TryAdd( "Nev", dolg.Nev );
+                foreach ( Kompetencia komp in komps )
                 {
-                    int szint = dolg.Kompetenciak.Where( k => k.Key == kompAzon ).FirstOrDefault( ).Value;
+                    int szint = dolg.Kompetenciak.Where( k => k.Key == komp.Azonosito ).FirstOrDefault( ).Value;
 
-                    current. TryAdd( kompDict[ kompAzon ], szintDict[ szint ] );
+                    current.TryAdd( komp.PropertyNev, szintDict[ szint ] );
                 }
 
                 result.Dolgozok.Add( current as ExpandoObject );

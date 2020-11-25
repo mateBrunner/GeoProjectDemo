@@ -1,64 +1,45 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Components.Authorization;
-using System.Linq;
+﻿using Microsoft.AspNetCore.Components.Authorization;
 using System.Threading.Tasks;
 using System.Security.Claims;
-using Blazored.SessionStorage;
+using Microsoft.JSInterop;
+using GeoProjectDemo.Services;
 
 namespace GeoProjectDemo
 {
     public class CustomAuthStateProvider : AuthenticationStateProvider
     {
 
-        private ISessionStorageService m_SessionStorage;
+        private IJSRuntime m_JSRuntime;
+        private SessionService m_SessionService;
 
-        public CustomAuthStateProvider( ISessionStorageService service )
+        public CustomAuthStateProvider( IJSRuntime jsRuntime, SessionService sessionService )
         {
-            m_SessionStorage = service;
+            m_JSRuntime = jsRuntime;
+            m_SessionService = sessionService;
         }
-
+            
         public override async Task<AuthenticationState> GetAuthenticationStateAsync( )
         {
+            SessionAdatok userAdatok = await GetSessionAdatok( );
 
-            var username = await m_SessionStorage.GetItemAsync<string>( "username" );
-
-            ClaimsIdentity identity;
-
-            if (username != null)
-            {
-                identity = new ClaimsIdentity( new[]
-                {
-                    new Claim(ClaimTypes.Name, "mate"),
-                    new Claim(ClaimTypes.Role, "role1"),
-
-                }, "apiauth_type" );
-            } else
-            {
-                identity = new ClaimsIdentity( );
-            }
-
-
-            var user = new ClaimsPrincipal( identity );
-
-            return await Task.FromResult( new AuthenticationState( user ) );
-
+            return await Task.FromResult( new AuthenticationState( userAdatok.ClaimsPrincipal ) );
         }
 
-        public void LogInUser(string username)
+        public async void LogInUser(string username)
         {
+            SessionAdatok userAdatok = await GetSessionAdatok( );
 
-            var identity = new ClaimsIdentity( new[]
-            {
-                new Claim(ClaimTypes.Name, "username"),
-                new Claim(ClaimTypes.Role, "role1"),
+            ( userAdatok.ClaimsPrincipal.Identity as ClaimsIdentity ).AddClaim( new Claim( ClaimTypes.Role, "role2" ) );
+            NotifyAuthenticationStateChanged( Task.FromResult( new AuthenticationState( userAdatok.ClaimsPrincipal ) ) );
+        }
 
-            }, "apiauth_type" );
+        private async Task<SessionAdatok> GetSessionAdatok( )
+        {
+            string browser = await m_JSRuntime.InvokeAsync<string>( "getBrowserInfo" );
+            var machineName = System.Environment.MachineName;
+            string hash = await m_SessionService.GetHash( machineName, browser );
 
-            var user = new ClaimsPrincipal( identity );
-
-            NotifyAuthenticationStateChanged( Task.FromResult( new AuthenticationState( user ) ) );
-
+            return m_SessionService.GetSessionAdatok( hash );
         }
 
 

@@ -8,7 +8,8 @@ using Microsoft.AspNetCore.Server.IIS;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components.Authorization;
 using GeoProjectDemo.Globals;
-using Blazored.SessionStorage;
+using GeoProjectDemo.Services;
+using Microsoft.JSInterop;
 
 namespace GeoProjectDemo
 {
@@ -30,11 +31,13 @@ namespace GeoProjectDemo
             services.AddRazorPages( );
             services.AddTelerikBlazor( );
             services.AddServerSideBlazor( );
+            services.AddSingleton<SessionService>( );
             services.AddSingleton<KompetenciaService>( );
 
-            services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>( );
-            services.AddBlazoredSessionStorage( );
+            services.AddHttpContextAccessor( );
             services.AddAuthorization( );
+            services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>( );
+            
 
         }
 
