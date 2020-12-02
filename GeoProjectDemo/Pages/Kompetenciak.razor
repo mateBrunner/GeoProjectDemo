@@ -1,23 +1,22 @@
 ﻿@page "/kompetenciak"
 
-@using GeoProjectDemo.Data
 @using GeoProjectDemo.Components
 @using System.Dynamic
 @using Telerik.DataSource
-@using System.Collections
-@using System.Collections.ObjectModel
-@using System.Collections.Specialized
-@using System.Text;
 @inject KompetenciaService KompetenciaService
 
-<div class="pageContent">
+<div class="view-size-page">
 
-    <TelerikMultiSelect Data="@Kategoriak" ValueField="Azonosito" TextField="Nev"
-                        Value="@SelectedKategoriak"
-                        ValueChanged="@( (List<long> v) => SelectedKategoriakChanged(v) )"
-                        Placeholder="Válassz ki kategóriákat" Filterable="true"
-                        Width="650px" ClearButton="true" AutoClose="false">
-    </TelerikMultiSelect>
+    <div class="kompetenciak-header">
+        <h2>Kompetenciák</h2>
+        <TelerikMultiSelect Data="@Kategoriak" ValueField="Azonosito" TextField="Nev"
+                            Value="@SelectedKategoriak"
+                            ValueChanged="@( (List<long> v) => SelectedKategoriakChanged(v) )"
+                            Placeholder="Válassz ki kategóriákat" Filterable="true"
+                            Width="600px" ClearButton="true" AutoClose="false">
+        </TelerikMultiSelect>
+    </div>
+
 
     @if ( Dolgozok == null )
     {
@@ -29,10 +28,27 @@
         <TelerikGrid Data="@Dolgozok" class="kompetencia-grid smallerFont"
                      Resizable="true"
                      Pageable="false" Sortable="true" Reorderable="false"
-                     EditMode="@GridEditMode.Inline"
+                     EditMode="@GridEditMode.Popup"
                      FilterMode="Telerik.Blazor.GridFilterMode.FilterMenu">
             <GridColumns>
                 <GridColumn Title="Név" Field="Nev" FieldType="typeof(string)" Width="100px" Locked="true" />
+                <GridColumn Width="42px" FieldType="typeof(string)">
+                    <Template>
+                        @{
+                            var azon = ( (ExpandoObject)context ).FirstOrDefault( x => x.Key == "Azonosito" ).Value;
+                            string roles = $"user{azon}, admin";
+                            <AuthorizeView Roles="@roles">
+                                <Authorized Context="authContext">
+                                    <TelerikButton Icon="edit" OnClick="@(e => Edit(context as ExpandoObject))"></TelerikButton>
+                                </Authorized>
+                                <NotAuthorized Context="notAuthContext">
+                                    <TelerikButton Icon="edit" Enabled="false"></TelerikButton>
+                                </NotAuthorized>
+
+                            </AuthorizeView>
+                        }
+                    </Template>
+                </GridColumn>
                 @foreach ( var komp in KompetenciaList )
                 {
                     <GridColumn Field="@komp.PropertyNev" FieldType="typeof(string)"
@@ -65,8 +81,42 @@
             </GridColumns>
         </TelerikGrid>
 
+        <TelerikWindow @bind-Visible="@EditWindowIsVisible" Modal="true">
+            <WindowTitle>
+                @{ 
+                    string title = ( EditedDolgozo as IDictionary<string, object> )[ "Nev" ].ToString( );
+                } 
+                <strong>@title</strong>
+            </WindowTitle>
+            <WindowContent>
+                <KompetenciaEditModal Dolgozo="EditedDolgozo" Kompetenciak="KompetenciaList" Szintek="Szintek" />
+                <div class="window-bottom">
+                    <TelerikButton class="button-primary" Icon="save" OnClick="SaveEdit">Mentés</TelerikButton>
+                </div>
+            </WindowContent>
+            <WindowActions>
+                <WindowAction Name="Close"></WindowAction>
+            </WindowActions>
+        </TelerikWindow>
+
     }
 </div>
+
+<style>
+
+    .window-bottom {
+        border-top: grey;
+        border-top-style: solid;
+        border-top-width: 1px;
+        margin-top: 10px;
+        padding-top: 10px;
+    }
+
+    .button-primary {
+        float: right;
+    }
+
+</style>
 
 @code {
 
@@ -81,6 +131,9 @@
     public List<Kompetencia> KompetenciaList = new List<Kompetencia>( );
     public List<KompetenciaKategoria> Kategoriak { get; set; } = new List<KompetenciaKategoria>( );
     public List<long> SelectedKategoriak { get; set; }
+
+    public bool EditWindowIsVisible { get; set; } = false;
+    public ExpandoObject EditedDolgozo { get; set; }
 
     protected override async Task OnAfterRenderAsync( bool first )
     {
@@ -154,5 +207,25 @@
         KompetenciaList.ForEach( k => k.IsVisible = SelectedKategoriak.Contains( (long)k.KategoriaAzonosito ) );
     }
 
+    void Edit(ExpandoObject dolgozoKompetenciak)
+    {
+        var cloned = CopyHelper.ShallowCopyExpando( dolgozoKompetenciak );
+        EditedDolgozo = cloned;
+        EditWindowIsVisible = true;
+    }
+
+    public void SaveEdit()
+    {
+        var dolgozo = EditedDolgozo as IDictionary<string, object>;
+        var ind = Dolgozok
+            .FindIndex( d => ( d as IDictionary<string, object> )[ "Azonosito" ] == dolgozo[ "Azonosito" ] );
+
+        var dolgozoDict = Dolgozok[ ind ] as IDictionary<string, object>;
+        foreach ( Kompetencia komp in KompetenciaList )
+            dolgozoDict[ komp.PropertyNev ] = dolgozo[ komp.PropertyNev ];
+
+        EditWindowIsVisible = false;
+        StateHasChanged( );
+    }
 
 }

@@ -2,26 +2,59 @@
 @inject NavigationManager navigationManager
 @inject AuthenticationStateProvider authStateProvider
 
-<h1>Login</h1>
-
-<AuthorizeView>
+@*<AuthorizeView>
     <Authorized>
         <p>Welcome, @context.User.Identity.Name</p>
     </Authorized>
     <NotAuthorized>
         <p>not authorized</p>
     </NotAuthorized>
-</AuthorizeView>
+</AuthorizeView>*@
 
-<TelerikTextBox @bind-Value="FelhasznaloNev" Label="Felhasználó">
-</TelerikTextBox>
 
-<TelerikTextBox @bind-Value="Jelszo" Label="Jelszó">
-</TelerikTextBox>
+<div class="login-div">
+    <h3>Bejelentkezés</h3>
 
-<TelerikButton @onclick="Bejelentkezes">Bejelentkezés</TelerikButton>
+    <TelerikTextBox Width="200px" @bind-Value="FelhasznaloNev" Label="Felhasználó">
+    </TelerikTextBox>
 
-Welcome to your new app.
+    <TelerikTextBox Width="200px" @bind-Value="Jelszo" Label="Jelszó">
+    </TelerikTextBox>
+
+    <TelerikButton class="button-primary login-button" @onclick="Bejelentkezes">Bejelentkezés</TelerikButton>
+</div>
+
+<style>
+
+    .k-textbox {
+        width: 200px;
+        margin-bottom: 12px;
+        border-radius: 5px;
+    }
+
+    .k-floating-label-container {
+        color: grey;
+        font-size: 10px;
+        padding-top: 20px;
+    }
+
+    .login-div {
+        align-items: center;
+        /*box-shadow: 0 0 5px;*/
+        box-shadow: 0 0 8px rgb(147, 220, 105) !important;
+        display: flex;
+        flex-direction: column;
+        height: 280px;
+        width: 340px;
+        margin: 80px auto;
+        border-radius: 5px;
+    }
+
+    .login-button {
+        margin-top: 30px;
+    }
+</style>
+
 
 @code {
 

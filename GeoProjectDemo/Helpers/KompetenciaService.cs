@@ -1,14 +1,14 @@
-using GeoProjectDemo.Models;
-using GeoProjectDemo.Globals;
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GeoProjectServiceTeszt;
+using System.Dynamic;
+using GeoProjectDemo.Data;
+using GeoProjectDemo.Models;
 
-namespace GeoProjectDemo.Data
+namespace GeoProjectDemo.Helpers
 {
     public class KompetenciaService
     {
@@ -76,6 +76,7 @@ namespace GeoProjectDemo.Data
                 var current = new ExpandoObject( );// as IDictionary<string, object>;
                 
                 current.TryAdd( "Nev", dolg.Nev );
+                current.TryAdd( "Azonosito", dolg.Azonosito );
                 foreach ( Kompetencia komp in komps )
                 {
                     int szint = dolg.Kompetenciak.Where( k => k.Key == komp.Azonosito ).FirstOrDefault( ).Value;

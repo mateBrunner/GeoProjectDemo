@@ -7,9 +7,9 @@ using GeoProjectDemo.Data;
 using Microsoft.AspNetCore.Server.IIS;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components.Authorization;
-using GeoProjectDemo.Globals;
 using GeoProjectDemo.Services;
 using Microsoft.JSInterop;
+using GeoProjectDemo.Helpers;
 
 namespace GeoProjectDemo
 {

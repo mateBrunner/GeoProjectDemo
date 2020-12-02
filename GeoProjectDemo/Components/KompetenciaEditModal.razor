@@ -1,0 +1,80 @@
+﻿@using System.Dynamic
+
+<div class="modal-content">
+    @if ( Kompetenciak != null )
+    {
+        @foreach (Kompetencia komp in Kompetenciak )
+        {
+        <div class="kompetencia-row">
+            <p class="kompetencia-nev">@komp.Nev</p>
+            
+            <TelerikComboBox Class="kompetencia-combo" Data="@Szintek" Value="@komp.SzintNev"
+                             ValueChanged="@( ( string value ) => ValamiMethod( value, komp.PropertyNev ) )"/>
+
+        </div>
+        }
+    }
+
+</div>
+
+<style>
+
+    
+    .modal-content {
+        height: 450px;
+        overflow-y: scroll;
+    }
+
+    .kompetencia-row {
+        display: flex;
+        flex-direction: row;
+        height: 30px;
+        margin-bottom: 8px;
+    }
+
+    .kompetencia-nev {
+        width: 230px;
+        margin: 5px;
+    }
+
+    .kompetencia-combo {
+        max-width: 165px;
+        margin-right: 16px;
+    }
+
+</style>
+
+@code {
+
+    [Parameter]
+    public ExpandoObject Dolgozo { get; set; }
+
+    [Parameter]
+    public List<Kompetencia> Kompetenciak { get; set; }
+
+    [Parameter]
+    public List<string> Szintek { get; set; }
+
+    public IDictionary<string, object> KompetenciaDict { get; set; } = new Dictionary<string, object>( );
+
+
+    protected override async Task OnAfterRenderAsync( bool first )
+    {
+        if ( !first )
+            return;
+
+        KompetenciaDict = Dolgozo as IDictionary<string, object>;
+
+        Kompetenciak.ForEach( k => k.SzintNev = KompetenciaDict[ k.PropertyNev ].ToString( ) );
+
+        StateHasChanged( );
+
+    }
+
+    private void ValamiMethod( string v, string komp )
+    {
+        Kompetenciak.Where( k => k.PropertyNev == komp ).FirstOrDefault( ).SzintNev = v;
+        ( Dolgozo as IDictionary<string, object> )[ komp ] = v;
+    }
+
+}
