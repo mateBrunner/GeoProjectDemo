@@ -5,10 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using GeoProjectServiceTeszt;
 using System.Dynamic;
-using GeoProjectDemo.Data;
-using GeoProjectDemo.Models;
+using BaseClasses;
 
-namespace GeoProjectDemo.Helpers
+namespace GeoProjectDemo.Services
 {
     public class KompetenciaService
     {

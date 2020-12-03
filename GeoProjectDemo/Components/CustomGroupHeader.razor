@@ -40,6 +40,9 @@
         color: inherit;
         text-align: start;
         padding-left: 4px;
+        z-index: 1;
+        position: absolute;
+        top: 7px;
     }
 
     .aquip-k-grid-group-underhead-base {
@@ -72,7 +75,11 @@
     .k-grid-header {
         max-height: 59px !important;
     }
-    
+
+    .k-grid-header th.k-header {
+        overflow: visible !important
+    }
+
     .k-grid th.k-header .k-icon.k-i-sort-asc-sm,
     .k-grid th.k-header .k-icon.k-i-sort-desc-sm {
         position: absolute;

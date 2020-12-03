@@ -20,4 +20,8 @@
     <Folder Include="Connected Services\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\BaseClasses\BaseClasses.csproj" />
+  </ItemGroup>
+
 </Project>
