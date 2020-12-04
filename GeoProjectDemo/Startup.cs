@@ -32,6 +32,7 @@ namespace GeoProjectDemo
             services.AddServerSideBlazor( );
             services.AddSingleton<SessionService>( );
             services.AddSingleton<KompetenciaService>( );
+            services.AddSingleton<FoglalasService>( );
 
             services.AddHttpContextAccessor( );
             services.AddAuthorization( );

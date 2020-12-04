@@ -1,0 +1,209 @@
+﻿@page "/foglalasok"
+
+@using GeoProjectDemo.Components
+@using System.Dynamic
+@using System.Text
+@using Telerik.DataSource
+@inject FoglalasService FoglalasService
+
+<div class="view-size-page">
+
+    <div class="foglalasok-header">
+        <h2>Foglalások</h2>
+    </div>
+
+
+    @if ( Dolgozok == null )
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+
+        <TelerikGrid Data="@Dolgozok" class="foglalas-grid smallerFont"
+                     Pageable="false" Sortable="false" Reorderable="false"
+                     FilterMode="Telerik.Blazor.GridFilterMode.None">
+            <GridColumns>
+                <GridColumn Title="Név" FieldType="typeof(string)" Width="150px" Locked="true" >
+                    <Template>
+                        @{ 
+                            var nev = ( (ExpandoObject)context ).FirstOrDefault( x => x.Key == "Nev" ).Value.ToString( );
+                        }
+                        <div class="cell-div-nev">
+                            @nev;
+                        </div>
+                    </Template>
+                </GridColumn>
+                @foreach ( var nap in NapList )
+                {
+                    <GridColumn Field="@nap.PropertyNev" FieldType="typeof(string)"
+                                Width="25px" Filterable="true" Sortable="true"
+                                Resizable="false">
+                        <HeaderTemplate>
+                            <CustomGroupHeader ColumnName="@nap.Date.Day.ToString()" IsFirst="@nap.IsFirstInGroup"
+                                               ColumnGroupName="@Constants.HONAPOK[nap.Date.Month]" />
+                        </HeaderTemplate>
+                        <Template>
+                            @{ 
+                                StringBuilder classes = new StringBuilder( "cell-div" );
+                                if ( !nap.IsMunkanap )
+                                    classes.Append( " cell-div-nem-munkanap" );
+
+                                if ( nap.Date.Month == DateTime.Now.Month && nap.Date.Day == DateTime.Now.Day )
+                                    classes.Append( " cell-div-ma" );
+
+                                var foglalas = (( (ExpandoObject)context ).FirstOrDefault( x => x.Key == nap.PropertyNev ).Value as NapiFoglalas);
+                                int ido1 = foglalas.GetOsszIdotartam;
+                                int ido2 = ido1 == 8 ? 2 : 0;
+                                
+                                string style1 = $"height: {ido1}px";
+                                string style2 = $"height: {ido2}px";
+                                <div class="@classes">
+                                    <div class="cell-div-tulfoglalas" style="@style2">
+
+                                    </div>
+                                    <div class="cell-div-foglalas" style="@style1">
+
+                                    </div>
+                                </div>
+
+                            }
+                        </Template>
+                    </GridColumn>
+                }
+            </GridColumns>
+        </TelerikGrid>
+
+    }
+</div>
+
+<style>
+
+    .foglalasok-header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        margin-bottom: 14px;
+        height: 56px;
+    }
+
+    .foglalas-grid {
+        display: contents !important;
+    }
+
+    div.smallerFont.k-grid td {
+        padding: 0px !important; /*az oszlop színezés miatt kell*/
+        height: 20px !important;
+    }
+
+    .cell-div-nev {
+        margin: 6px;
+    }
+
+    .cell-div {
+        padding-bottom: 4px;
+        flex-direction: column;
+        align-items: center;
+        height: 100%;
+        justify-content: flex-end;
+        display: flex;
+    }
+
+    .cell-div-nem-munkanap {
+        width: 100%;
+        height: 100%;
+        background-color: lightgrey;
+    }
+
+    .cell-div-ma {
+        border-style: solid;
+        border-width: 0px 2px;
+        border-color: rgb(147, 220, 105);
+    }
+
+    .cell-div-tulfoglalas {
+        width: 80%;
+        background-color: red;
+    }
+
+    .cell-div-foglalas {
+        width: 80%;
+        background-color: steelblue;
+    }
+
+    /*CustomGroupHeader dolgai*/
+    .cut-text {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        height: 1.2em;
+        white-space: nowrap;
+        margin-left: 2px;
+    }
+
+    .aquip-k-grid-group-head-base {
+        margin-left: -12px;
+        margin-right: -12px;
+        margin-top: -8px;
+        margin-bottom: -10px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+        background: inherit;
+        color: transparent;
+    }
+
+    .aquip-k-grid-group-head-first {
+        border-left-color: inherit;
+        border-left-style: solid;
+        border-left-width: 1px;
+        border-color: rgba(0, 0, 0, 0.08);
+        color: inherit;
+        text-align: start;
+        padding-left: 4px;
+        z-index: 1;
+        position: absolute;
+        top: 7px;
+        height: 10px;
+        background: #f6f6f6 !important;
+    }
+
+    .aquip-k-grid-group-underhead-base {
+        margin-left: -12px;
+        margin-right: -12px;
+        margin-top: -10px;
+        margin-bottom: -8px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+        padding-left: 4px;
+        border-top-color: inherit;
+        border-top-style: solid;
+        border-top-width: 1px;
+        border-left-color: inherit;
+        border-left-style: solid;
+        border-left-width: 1px;
+        border-color: rgba(0, 0, 0, 0.08);
+        background: inherit;
+        color: inherit;
+    }
+
+    .aquip-k-grid-group-underhead-ungrouped {
+        border-top-color: transparent;
+    }
+
+    .k-grid th {
+        border-left-style: none;
+    }
+
+    .k-grid-header {
+        max-height: 59px !important;
+    }
+
+    .k-grid-header th.k-header {
+        overflow: visible !important
+    }
+
+</style>
+
+@code {
+
+
+}

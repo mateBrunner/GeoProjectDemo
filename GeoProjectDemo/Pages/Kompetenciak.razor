@@ -1,9 +1,7 @@
 ﻿@page "/kompetenciak"
 
-@using GeoProjectDemo.Components
 @using System.Dynamic
 @using Telerik.DataSource
-@inject KompetenciaService KompetenciaService
 
 <div class="view-size-page">
 
@@ -104,6 +102,18 @@
 
 <style>
 
+    .kompetencia-grid {
+        display: contents !important;
+    }
+
+    .kompetenciak-header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        margin-bottom: 14px;
+        height: 56px;
+    }
+
     .window-bottom {
         border-top: grey;
         border-top-style: solid;
@@ -116,48 +126,104 @@
         float: right;
     }
 
+
+
+    /*CustomGroupHeader dolgai*/
+    .cut-text {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        width: calc(100% - 26px);
+        height: 1.2em;
+        white-space: nowrap;
+    }
+
+    .aquip-k-grid-group-head-base {
+        margin-left: -12px;
+        margin-right: -12px;
+        margin-top: -8px;
+        margin-bottom: -10px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+        background: inherit;
+        color: transparent;
+    }
+
+    .aquip-k-grid-group-head-first {
+        border-left-color: inherit;
+        border-left-style: solid;
+        border-left-width: 1px;
+        border-color: rgba(0, 0, 0, 0.08);
+        color: inherit;
+        text-align: start;
+        padding-left: 4px;
+        z-index: 1;
+        position: absolute;
+        top: 7px;
+        height: 10px;
+        background: #f6f6f6 !important;
+    }
+
+    .aquip-k-grid-group-underhead-base {
+        margin-left: -12px;
+        margin-right: -12px;
+        margin-top: -10px;
+        margin-bottom: -8px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+        padding-left: 4px;
+        border-top-color: inherit;
+        border-top-style: solid;
+        border-top-width: 1px;
+        border-left-color: inherit;
+        border-left-style: solid;
+        border-left-width: 1px;
+        border-color: rgba(0, 0, 0, 0.08);
+        background: inherit;
+        color: inherit;
+    }
+
+    .aquip-k-grid-group-underhead-ungrouped {
+        border-top-color: transparent;
+    }
+
+    .k-grid th {
+        border-left-style: none;
+    }
+
+    .k-grid-header {
+        max-height: 59px !important;
+    }
+
+    .k-grid-header th.k-header {
+        overflow: visible !important
+    }
+
+    .k-grid th.k-header .k-icon.k-i-sort-asc-sm,
+    .k-grid th.k-header .k-icon.k-i-sort-desc-sm {
+        position: absolute;
+        right: 25px;
+        bottom: 8px;
+    }
+
+
 </style>
 
 @code {
 
-    TelerikMultiSelect<string, string> KategoriaSelect { get; set; }
-
     Dictionary<string, FilterMenuTemplateContext> theFilterContext { get; set; }
     Dictionary<string, List<string>> checkedSzintek { get; set; }
 
-    public Dictionary<long?, string> KategoriaDict { get; set; } = new Dictionary<long?, string>( );
-    public List<string> Szintek;
-    private List<ExpandoObject> Dolgozok;
-    public List<Kompetencia> KompetenciaList = new List<Kompetencia>( );
-    public List<KompetenciaKategoria> Kategoriak { get; set; } = new List<KompetenciaKategoria>( );
-    public List<long> SelectedKategoriak { get; set; }
 
-    public bool EditWindowIsVisible { get; set; } = false;
-    public ExpandoObject EditedDolgozo { get; set; }
 
-    protected override async Task OnAfterRenderAsync( bool first )
+    protected void SetFilterContext(List<Kompetencia> kompetenciak)
     {
-        if ( !first )
-            return;
-
-        var res = await KompetenciaService.GetAdatok( );
-        Szintek = res.Szintek;
-        KompetenciaList = res.Kompetenciak;
-        Dolgozok = res.Dolgozok;
-        Kategoriak = res.Kategoriak;
-
-        Kategoriak.ForEach( k => KategoriaDict.Add( k.Azonosito, k.Nev ) );
-        SelectedKategoriak = Kategoriak.Select( k => k.Azonosito ).ToList( );
-
         theFilterContext = new Dictionary<string, FilterMenuTemplateContext>( );
         checkedSzintek = new Dictionary<string, List<string>>( );
-        KompetenciaList.ForEach( x =>
+        kompetenciak.ForEach( x =>
         {
             theFilterContext.Add( x.PropertyNev, new FilterMenuTemplateContext( ) );
             checkedSzintek.Add( x.PropertyNev, new List<string>( ) );
         } );
-
-        StateHasChanged( );
     }
 
 
@@ -201,31 +267,6 @@
         }
     }
 
-    void SelectedKategoriakChanged( List<long> values )
-    {
-        SelectedKategoriak = values;
-        KompetenciaList.ForEach( k => k.IsVisible = SelectedKategoriak.Contains( (long)k.KategoriaAzonosito ) );
-    }
-
-    void Edit(ExpandoObject dolgozoKompetenciak)
-    {
-        var cloned = CopyHelper.ShallowCopyExpando( dolgozoKompetenciak );
-        EditedDolgozo = cloned;
-        EditWindowIsVisible = true;
-    }
-
-    public void SaveEdit()
-    {
-        var dolgozo = EditedDolgozo as IDictionary<string, object>;
-        var ind = Dolgozok
-            .FindIndex( d => ( d as IDictionary<string, object> )[ "Azonosito" ] == dolgozo[ "Azonosito" ] );
-
-        var dolgozoDict = Dolgozok[ ind ] as IDictionary<string, object>;
-        foreach ( Kompetencia komp in KompetenciaList )
-            dolgozoDict[ komp.PropertyNev ] = dolgozo[ komp.PropertyNev ];
-
-        EditWindowIsVisible = false;
-        StateHasChanged( );
-    }
+    
 
 }

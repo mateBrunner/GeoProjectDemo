@@ -4,6 +4,7 @@ html, body {
     margin: 0px;
 }
 
+/*Telerikes piros felülírása*/
 .k-text-selection ::selection, .k-block ::selection, .k-panel ::selection, .k-pane-wrapper ::selection,
 .k-view ::selection, .k-progressbar ::selection, .k-numerictextbox ::selection, .k-flatcolorpicker ::selection,
 .k-combobox ::selection, .k-dateinput ::selection, .k-datepicker ::selection, .k-datetimepicker ::selection,
@@ -42,6 +43,7 @@ a, .btn-link {
     color: #0366d6;
 }
 
+
 .main {
     display: flex;
     flex-direction: column;
@@ -74,10 +76,6 @@ a, .btn-link {
     margin: 0px !important;
 }
 
-
-.kompetencia-grid {
-    display: contents !important;
-}
 
 
 .valid.modified:not([type=checkbox]) {
@@ -134,14 +132,6 @@ div.smallerFont .k-grid-edit-cell input {
 
 .k-multiselect-wrap {
     overflow-y: scroll
-}
-
-.kompetenciak-header {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    margin-bottom: 14px;
-    height: 56px;
 }
 
 .custom-grid-command-button {

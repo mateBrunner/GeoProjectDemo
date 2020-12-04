@@ -29,7 +29,6 @@ namespace GeoProjectDemo.Services
                     new ClaimsIdentity( new[]
                     {
                         new Claim(ClaimTypes.Name, hash.Split("||")[0]),
-                        new Claim(ClaimTypes.Role, "admin"),
                         new Claim(ClaimTypes.Role, "user228")
                     }, "authentication type" ) )
             } );
