@@ -2,9 +2,15 @@
 @attribute [Authorize( Roles = "role2" )]
 
 <div class="page-content">
-    <TelerikButton>
+    <TelerikButton ImageUrl="/Images/kompetenciaIkon.png">
         <NavLink class="link" href="kompetenciak">
             Kompetenciák
+        </NavLink>
+    </TelerikButton>
+
+    <TelerikButton ImageUrl="/Images/munkaerofoglalasIkon.png">
+        <NavLink class="link" href="foglalasok">
+            Erőforrás foglalások
         </NavLink>
     </TelerikButton>
 </div>
@@ -29,7 +35,7 @@
     .k-button {
         height: 100px;
         width: 330px;
-        font-size: 28px;
+        font-size: 23px;
         border-color: rgb(147, 220, 105) !important;
         color: #ffffff;
         background-color: rgb(147, 220, 105) !important;
@@ -44,6 +50,14 @@
 
     .k-button:active {
         background-image: linear-gradient(rgba(147, 220, 130, 0), rgba(147, 220, 105, 0.6)) !important;
+    }
+
+    .k-image {
+        width: 45px;
+        height: 45px;
+        margin-left: 20px !important;
+        margin-right: -20px !important;
+        filter: drop-shadow(2px 2px 1px darkgreen);
     }
 
 </style>

@@ -25,7 +25,7 @@ namespace GeoProjectDemo.Services
             CallResultSelectDolgozokRecords dolgozokRes =
                 await Globals.Globals.ProjectServiceTeszt.SelectDolgozokRecordsAsync( res2.Session.SessionId, false );
 
-            //TODO - osztályok
+            //TODO - osztályok 
             dolgozokRes.Dolgozok = dolgozokRes.Dolgozok.Where( d =>
              d.Osztaly >= 11100 && d.Osztaly < 11200 && d.ErvenyessegKezdete < DateTime.Now && (
              d.ErvenyessegVege > DateTime.Now || d.ErvenyessegVege == null ) ).ToArray( );
@@ -72,7 +72,7 @@ namespace GeoProjectDemo.Services
             //Dolgozók összegyûjtése
             foreach ( Dolgozok dolg in dolgozokRes.Dolgozok )
             {
-                var current = new ExpandoObject( );// as IDictionary<string, object>;
+                var current = new ExpandoObject( );
                 
                 current.TryAdd( "Nev", dolg.Nev );
                 current.TryAdd( "Azonosito", dolg.Azonosito );

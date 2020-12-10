@@ -1,4 +1,5 @@
-﻿using GeoProjectDemo.Services;
+﻿using BaseClasses;
+using GeoProjectDemo.Services;
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;

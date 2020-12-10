@@ -7,18 +7,21 @@
 
     <div class="kompetenciak-header">
         <h2>Kompetenciák</h2>
+
+
         <TelerikMultiSelect Data="@Kategoriak" ValueField="Azonosito" TextField="Nev"
-                            Value="@SelectedKategoriak"
+                            Value="@SelectedKategoriak" Class="multi-select"
                             ValueChanged="@( (List<long> v) => SelectedKategoriakChanged(v) )"
                             Placeholder="Válassz ki kategóriákat" Filterable="true"
                             Width="600px" ClearButton="true" AutoClose="false">
         </TelerikMultiSelect>
+        <TelerikButton Class="excel-button" Icon="@IconName.FileExcel" OnClick="@(e => ExcelExport())"></TelerikButton>
     </div>
 
 
     @if ( Dolgozok == null )
     {
-        <p><em>Loading...</em></p>
+        <p><em>Adatok betöltése...</em></p>
     }
     else
     {
@@ -64,9 +67,8 @@
                             {
                                 <div>
                                     <TelerikCheckBox Value="@(IsCheckboxInCurrentFilter(context.FilterDescriptor, szint))"
-                                                     TValue="bool"
-                                                     ValueChanged="@((value) => UpdatecheckedSzintek(value, szint, komp.PropertyNev))"
-                                                     Id="@($"szint_{szint}")">
+                                                     TValue="bool" Id="@($"szint_{szint}")"
+                                                     ValueChanged="@((value) => UpdatecheckedSzintek(value, szint, komp.PropertyNev))">
                                     </TelerikCheckBox>
                                     <label for=" @($"szint_{szint}")">
                                         @szint
@@ -126,7 +128,10 @@
         float: right;
     }
 
-
+    .multi-select {
+        margin-left: auto;
+        margin-right: 10px;
+    }
 
     /*CustomGroupHeader dolgai*/
     .cut-text {
@@ -205,6 +210,22 @@
         bottom: 8px;
     }
 
+    .k-button.excel-button {
+        width: 36px;
+        height: 36px;
+        border-color: rgb(147, 220, 105) !important;
+        color: #ffffff;
+        background-color: rgb(147, 220, 105) !important;
+        background-image: linear-gradient(90deg, rgba(135,210,95,1) 0%, rgba(147,220,105,1) 35%, rgba(157,230,115,1) 100%);
+    }
+
+    .excel-button .k-icon,
+    .excel-button .k-icon::before {
+        width: 32px;
+        height: 32px;
+        font-size: 32px;
+    }
+
 
 </style>
 
@@ -212,8 +233,6 @@
 
     Dictionary<string, FilterMenuTemplateContext> theFilterContext { get; set; }
     Dictionary<string, List<string>> checkedSzintek { get; set; }
-
-
 
     protected void SetFilterContext(List<Kompetencia> kompetenciak)
     {

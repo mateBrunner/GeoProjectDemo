@@ -15,7 +15,7 @@
 
     @if ( Dolgozok == null )
     {
-        <p><em>Loading...</em></p>
+        <p><em>Adatok betöltése...</em></p>
     }
     else
     {
@@ -24,7 +24,7 @@
                      Pageable="false" Sortable="false" Reorderable="false"
                      FilterMode="Telerik.Blazor.GridFilterMode.None">
             <GridColumns>
-                <GridColumn Title="Név" FieldType="typeof(string)" Width="150px" Locked="true" >
+                <GridColumn Title="Név" FieldType="typeof(string)" Width="150px" Locked="true" Resizable="false" >
                     <Template>
                         @{ 
                             var nev = ( (ExpandoObject)context ).FirstOrDefault( x => x.Key == "Nev" ).Value.ToString( );
@@ -37,8 +37,7 @@
                 @foreach ( var nap in NapList )
                 {
                     <GridColumn Field="@nap.PropertyNev" FieldType="typeof(string)"
-                                Width="25px" Filterable="true" Sortable="true"
-                                Resizable="false">
+                                Width="25px" Filterable="true" Sortable="true" Resizable="false">
                         <HeaderTemplate>
                             <CustomGroupHeader ColumnName="@nap.Date.Day.ToString()" IsFirst="@nap.IsFirstInGroup"
                                                ColumnGroupName="@Constants.HONAPOK[nap.Date.Month]" />
@@ -53,20 +52,30 @@
                                     classes.Append( " cell-div-ma" );
 
                                 var foglalas = (( (ExpandoObject)context ).FirstOrDefault( x => x.Key == nap.PropertyNev ).Value as NapiFoglalas);
-                                int ido1 = foglalas.GetOsszIdotartam;
-                                int ido2 = ido1 == 8 ? 2 : 0;
-                                
-                                string style1 = $"height: {ido1}px";
-                                string style2 = $"height: {ido2}px";
-                                <div class="@classes">
-                                    <div class="cell-div-tulfoglalas" style="@style2">
+                                int normalFoglalasIdo = foglalas.GetOsszIdotartam;
+                                int tulfoglalasIdo = foglalas.GetTulfoglalas;
 
-                                    </div>
-                                    <div class="cell-div-foglalas" style="@style1">
+                                string styleNormal = $"height: {normalFoglalasIdo}px";
+                                string styleTulfoglalas = $"height: {tulfoglalasIdo}px";
 
-                                    </div>
-                                </div>
-
+                                //TelerikTooltiphez:
+                                //string id = $"a{ nap.Date.Month }{ nap.Date.Day }{ ((ExpandoObject)context).FirstOrDefault(x => x.Key == "Azonosito").Value }";
+                                //string id2 = $"#{adi}";
+                                <div class="@classes ht">
+                                    <div class="cell-div-tulfoglalas" style="@styleTulfoglalas"/>
+                                    <div class="cell-div-foglalas" style="@styleNormal"/>
+                                    
+                                    @*<TelerikTooltip TargetSelector="@id2">
+                                        <Template Context="another">
+                                            @{
+                                                <div>
+                                                    @foglalas.ToolTipSzoveg
+                                                </div>
+                                            }
+                                        </Template>
+                                    </TelerikTooltip>*@
+                                    @*<div class="tooltip">asdf</div>*@
+                                </div>                                
                             }
                         </Template>
                     </GridColumn>
@@ -113,6 +122,7 @@
         width: 100%;
         height: 100%;
         background-color: lightgrey;
+        opacity: 0.4;
     }
 
     .cell-div-ma {
@@ -201,9 +211,27 @@
         overflow: visible !important
     }
 
+    .ht:hover .tooltip {
+        display: block;
+    }
+
+    .tooltip {
+        display: none;
+        color: black;
+        background-color: white;
+        width: 360px;
+        right: 50%;
+        height: 70px;
+        margin-left: 32%; 
+        margin-bottom: -5%; 
+        position: absolute;
+        border-width: 1px;
+        border-color: lightgray;
+        border-style: double;
+        border-radius: 3px;
+        padding: 6px;
+        z-index: 1000;
+    }
+        
+
 </style>
-
-@code {
-
-
-}

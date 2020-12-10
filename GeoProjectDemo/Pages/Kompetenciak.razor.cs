@@ -6,6 +6,11 @@ using GeoProjectDemo.Services;
 using System.Dynamic;
 using BaseClasses;
 using GeoProjectDemo.Helpers;
+using System.IO;
+using System.Globalization;
+using System;
+using Microsoft.JSInterop;
+using Telerik.Windows.Documents.Spreadsheet.Model;
 
 namespace GeoProjectDemo.Pages
 {
@@ -13,6 +18,9 @@ namespace GeoProjectDemo.Pages
     {
         [Inject]
         KompetenciaService m_Service { get; set; }
+
+        [Inject]
+        IJSRuntime jsRuntime { get; set; }
 
         public Dictionary<long?, string> KategoriaDict { get; set; } = new Dictionary<long?, string>( );
         public List<string> Szintek { get; set; }
@@ -39,6 +47,7 @@ namespace GeoProjectDemo.Pages
             SelectedKategoriak = Kategoriak.Select( k => k.Azonosito ).ToList( );
 
             SetFilterContext( KompetenciaList );
+
 
             StateHasChanged( );
         }
@@ -68,6 +77,26 @@ namespace GeoProjectDemo.Pages
 
             EditWindowIsVisible = false;
             StateHasChanged( );
+        }
+
+        public async void ExcelExport()
+        {
+            if ( Dolgozok == null )
+                return;
+
+            Telerik.Windows.Documents.Spreadsheet.FormatProviders.IWorkbookFormatProvider formatProvider = new Telerik.Windows.Documents.Spreadsheet.FormatProviders.OpenXml.Xlsx.XlsxFormatProvider( );
+
+            Workbook wb = ExcelHelper.ExportKompetenciakToExcel( Dolgozok, KompetenciaList, KategoriaDict );
+
+            byte[] bytes;
+            using ( MemoryStream output = new MemoryStream( ) )
+            {
+                formatProvider.Export( wb, output );
+                bytes = output.ToArray( );
+            }
+
+            await jsRuntime.InvokeAsync<object>( "saveAsFile", "Kompetenciak.xlsx", Convert.ToBase64String( bytes ) );
+
         }
 
     }
