@@ -4,12 +4,13 @@
 @using System.Dynamic
 @using System.Text
 @using Telerik.DataSource
-@inject FoglalasService FoglalasService
 
 <div class="view-size-page">
 
     <div class="foglalasok-header">
         <h2>Foglalások</h2>
+
+        <TelerikButton Class="button-primary" OnClick="@(e => EditWindow())">Kompetenciák</TelerikButton>
     </div>
 
 
@@ -24,9 +25,9 @@
                      Pageable="false" Sortable="false" Reorderable="false"
                      FilterMode="Telerik.Blazor.GridFilterMode.None">
             <GridColumns>
-                <GridColumn Title="Név" FieldType="typeof(string)" Width="150px" Locked="true" Resizable="false" >
+                <GridColumn Title="Név" FieldType="typeof(string)" Width="150px" Locked="true" Resizable="false">
                     <Template>
-                        @{ 
+                        @{
                             var nev = ( (ExpandoObject)context ).FirstOrDefault( x => x.Key == "Nev" ).Value.ToString( );
                         }
                         <div class="cell-div-nev">
@@ -43,7 +44,7 @@
                                                ColumnGroupName="@Constants.HONAPOK[nap.Date.Month]" />
                         </HeaderTemplate>
                         <Template>
-                            @{ 
+                            @{
                                 StringBuilder classes = new StringBuilder( "cell-div" );
                                 if ( !nap.IsMunkanap )
                                     classes.Append( " cell-div-nem-munkanap" );
@@ -51,7 +52,7 @@
                                 if ( nap.Date.Month == DateTime.Now.Month && nap.Date.Day == DateTime.Now.Day )
                                     classes.Append( " cell-div-ma" );
 
-                                var foglalas = (( (ExpandoObject)context ).FirstOrDefault( x => x.Key == nap.PropertyNev ).Value as NapiFoglalas);
+                                var foglalas = ( ( (ExpandoObject)context ).FirstOrDefault( x => x.Key == nap.PropertyNev ).Value as NapiFoglalas );
                                 int normalFoglalasIdo = foglalas.GetOsszIdotartam;
                                 int tulfoglalasIdo = foglalas.GetTulfoglalas;
 
@@ -62,26 +63,42 @@
                                 //string id = $"a{ nap.Date.Month }{ nap.Date.Day }{ ((ExpandoObject)context).FirstOrDefault(x => x.Key == "Azonosito").Value }";
                                 //string id2 = $"#{adi}";
                                 <div class="@classes ht">
-                                    <div class="cell-div-tulfoglalas" style="@styleTulfoglalas"/>
-                                    <div class="cell-div-foglalas" style="@styleNormal"/>
-                                    
+                                    <div class="cell-div-tulfoglalas" style="@styleTulfoglalas" />
+                                    <div class="cell-div-foglalas" style="@styleNormal" />
+
                                     @*<TelerikTooltip TargetSelector="@id2">
-                                        <Template Context="another">
-                                            @{
-                                                <div>
-                                                    @foglalas.ToolTipSzoveg
-                                                </div>
-                                            }
-                                        </Template>
-                                    </TelerikTooltip>*@
+                                            <Template Context="another">
+                                                @{
+                                                    <div>
+                                                        @foglalas.ToolTipSzoveg
+                                                    </div>
+                                                }
+                                            </Template>
+                                        </TelerikTooltip>*@
                                     @*<div class="tooltip">asdf</div>*@
-                                </div>                                
+                                </div>
+
                             }
                         </Template>
                     </GridColumn>
                 }
             </GridColumns>
         </TelerikGrid>
+
+        <TelerikWindow @bind-Visible="@FilterWindowIsVisible" Modal="true">
+            <WindowTitle>
+                <strong>Szűrés kompetenciákra</strong>
+            </WindowTitle>
+            <WindowContent>
+                <FoglalasokFilterModal Kompetenciak="@KompetenciaAdatok.Kompetenciak"></FoglalasokFilterModal>
+                <div class="popup-window-bottom">
+                    <TelerikButton class="button-primary" Icon="save" OnClick="SaveFilter">Mentés</TelerikButton>
+                </div>
+            </WindowContent>
+            <WindowActions>
+                <WindowAction Name="Close"></WindowAction>
+            </WindowActions>
+        </TelerikWindow>
 
     }
 </div>
@@ -207,9 +224,9 @@
         max-height: 59px !important;
     }
 
-    .k-grid-header th.k-header {
-        overflow: visible !important
-    }
+        .k-grid-header th.k-header {
+            overflow: visible !important
+        }
 
     .ht:hover .tooltip {
         display: block;
@@ -222,8 +239,8 @@
         width: 360px;
         right: 50%;
         height: 70px;
-        margin-left: 32%; 
-        margin-bottom: -5%; 
+        margin-left: 32%;
+        margin-bottom: -5%;
         position: absolute;
         border-width: 1px;
         border-color: lightgray;
@@ -232,6 +249,4 @@
         padding: 6px;
         z-index: 1000;
     }
-        
-
 </style>

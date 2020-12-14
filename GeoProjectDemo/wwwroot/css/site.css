@@ -142,6 +142,14 @@ div.smallerFont .k-grid-edit-cell input {
     background-color: rgb(147, 220, 105) !important;
 }
 
+.popup-window-bottom {
+    border-top: grey;
+    border-top-style: solid;
+    border-top-width: 1px;
+    margin-top: 10px;
+    padding-top: 10px;
+}
+
 .button-primary {
     color: white !important;
     border-radius: 4px !important;

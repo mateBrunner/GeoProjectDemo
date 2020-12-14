@@ -1,0 +1,107 @@
+﻿@using System.Dynamic
+
+<div class="modal-content">
+    @if ( Kompetenciak != null )
+    {
+
+        <TelerikGrid Data="@Kompetenciak" Class="kompetencia-grid smallerFont">
+            <GridColumns>
+                <GridColumn Title="Kategória" Field="KategoriaNev" FieldType="typeof(string)" Width="90px" >
+                </GridColumn>
+                <GridColumn Title="Kompetencia" Field="Nev" FieldType="typeof(string)" Width="90px">
+                </GridColumn>
+                <GridColumn Width="150px">
+                    <Template>
+                        @{
+                            var komp = (Kompetencia)context;
+                            long azon = komp.Szint;
+                        }
+                        <TelerikComboBox Data="@Szintek" Width="175px"
+                                         Value="@azon" ValueField="Azonosito" TextField="Nev"
+                                         ValueChanged="@( (long v) => UpdateKompetenciak(v, komp.Azonosito) )">
+                                         
+                        </TelerikComboBox>
+                    </Template>
+                </GridColumn>
+
+            </GridColumns>            
+        </TelerikGrid>
+
+    }
+
+</div>
+
+<style>
+
+    .kompetencia-grid {
+        height: 450px;
+    }
+
+    div.smallerFont.k-grid td {
+        height: 26px !important;
+        padding: 3px !important;
+    }
+    
+    .modal-content {
+        height: 450px;
+        width: 420px;
+    }
+
+    .kompetencia-row {
+        display: flex;
+        flex-direction: row;
+        height: 30px;
+        margin-bottom: 8px;
+    }
+
+    .kompetencia-nev {
+        width: 230px;
+        margin: 5px;
+    }
+
+    .kompetencia-combo {
+        max-width: 165px;
+        margin-right: 16px;
+    }
+
+</style>
+
+@code {
+
+    [Parameter]
+    public List<Kompetencia> Kompetenciak { get; set; }
+
+    long initial = 0;
+
+    public List<KompetenciaSzint> Szintek { get; set; } = new List<KompetenciaSzint>( )
+    {
+        new KompetenciaSzint() { Azonosito = 0, Nev = "NA" },
+        new KompetenciaSzint() { Azonosito = 21000, Nev = "0. nem releváns" },
+        new KompetenciaSzint() { Azonosito = 21010, Nev = "1. nincs" },
+        new KompetenciaSzint() { Azonosito = 21020, Nev = "2. kezdő" },
+        new KompetenciaSzint() { Azonosito = 21030, Nev = "3. gyakorlott" },
+        new KompetenciaSzint() { Azonosito = 21040, Nev = "4. szakértő" },
+        new KompetenciaSzint() { Azonosito = 21050, Nev = "5. jedi" },
+    };
+
+    //[Parameter]
+    //public List<string> Szintek { get; set; }
+
+    public IDictionary<string, object> KompetenciaDict { get; set; } = new Dictionary<string, object>( );
+
+
+    protected override async Task OnAfterRenderAsync( bool first )
+    {
+        if ( !first )
+            return;
+
+        StateHasChanged( );
+
+    }
+
+    private void UpdateKompetenciak( object varn, long kompAzon )
+    {
+        Kompetenciak.Where( k => k.Azonosito == kompAzon ).FirstOrDefault( ).Szint = (long)varn;
+    }
+
+}

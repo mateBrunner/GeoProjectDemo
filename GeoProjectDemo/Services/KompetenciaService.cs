@@ -54,7 +54,8 @@ namespace GeoProjectDemo.Services
                 {
                     Azonosito = k.Azonosito,
                     Nev = k.Ertek,
-                    KategoriaAzonosito = k.SzuloKodAzonosito
+                    KategoriaAzonosito = k.SzuloKodAzonosito,
+                    KategoriaNev = result.Kategoriak.Where( c => c.Azonosito == k.SzuloKodAzonosito ).FirstOrDefault( ).Nev
                 } ).ToList( );
             komps[ 0 ].IsFirstInGroup = true;
             komps[ 0 ].PropertyNev = "KompProp0";
