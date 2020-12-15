@@ -11,6 +11,7 @@ using System.Globalization;
 using System;
 using Microsoft.JSInterop;
 using Telerik.Windows.Documents.Spreadsheet.Model;
+using System.ComponentModel.DataAnnotations;
 
 namespace GeoProjectDemo.Pages
 {
@@ -31,6 +32,10 @@ namespace GeoProjectDemo.Pages
 
         public bool EditWindowIsVisible { get; set; } = false;
         public ExpandoObject EditedDolgozo { get; set; }
+        public bool UjKompWindowIsVisible { get; set; }
+        public bool UjKompKatWindowIsVisible { get; set; }
+        public UjKompetenciaModel ujKompetenciaModel = new UjKompetenciaModel( );
+        public UjKompKatModel ujKompKatModel = new UjKompKatModel( );
 
         protected override async Task OnAfterRenderAsync( bool first )
         {
@@ -47,7 +52,6 @@ namespace GeoProjectDemo.Pages
             SelectedKategoriak = Kategoriak.Select( k => k.Azonosito ).ToList( );
 
             SetFilterContext( KompetenciaList );
-
 
             StateHasChanged( );
         }
@@ -79,6 +83,32 @@ namespace GeoProjectDemo.Pages
             StateHasChanged( );
         }
 
+        public async void UjKompetencia()
+        {
+            ujKompetenciaModel = new UjKompetenciaModel( );
+            UjKompWindowIsVisible = true;
+        }
+
+        public void SaveUjKompetencia()
+        {
+            UjKompWindowIsVisible = false;
+        }
+
+        public async void UjKompetenciaKategoria()
+        {
+            UjKompKatWindowIsVisible = true;
+        }
+
+        public void SaveUjKompetenciaKat( )
+        {
+            UjKompKatWindowIsVisible = false;
+        }
+
+        public void SaveUjKompKat()
+        {
+
+        }
+
         public async void ExcelExport()
         {
             if ( Dolgozok == null )
@@ -98,8 +128,25 @@ namespace GeoProjectDemo.Pages
             await jsRuntime.InvokeAsync<object>( "saveAsFile", "Kompetenciak.xlsx", Convert.ToBase64String( bytes ) );
 
         }
-
     }
 
+    public class UjKompetenciaModel
+    {
+        [Required( ErrorMessage = "Név hiányzik" )]
+        [StringLength( 10, ErrorMessage = "A megadott név túl hosszú" )]
+        public string Nev { get; set; }
+
+        [ Required( ErrorMessage = "Kategória hiányzik" ) ]
+        
+        public long? Kategoria { get; set; }
+    }
+
+    public class UjKompKatModel
+    {
+
+        [Required( ErrorMessage = "Név hiányzik" )]
+        [StringLength( 10, ErrorMessage = "A megadott név túl hosszú" )]
+        public string Nev { get; set; }
+    }
 
 }

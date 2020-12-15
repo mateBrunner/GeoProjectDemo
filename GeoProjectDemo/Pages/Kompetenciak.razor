@@ -8,13 +8,24 @@
     <div class="kompetenciak-header">
         <h2>Kompetenciák</h2>
 
+        <div class="header-to-right">
+            <div class="two-button-div">
+                <TelerikButton class="button-primary half-height-button" OnClick="@(e => UjKompetencia())">
+                    Új kompetencia
+                </TelerikButton>
+                <TelerikButton class="button-primary half-height-button" OnClick="@(e => UjKompetenciaKategoria())">
+                    Új kompetencia kategória
+                </TelerikButton>
+            </div>
 
-        <TelerikMultiSelect Data="@Kategoriak" ValueField="Azonosito" TextField="Nev"
-                            Value="@SelectedKategoriak" Class="multi-select"
-                            ValueChanged="@( (List<long> v) => SelectedKategoriakChanged(v) )"
-                            Placeholder="Válassz ki kategóriákat" Filterable="true"
-                            Width="600px" ClearButton="true" AutoClose="false">
-        </TelerikMultiSelect>
+
+            <TelerikMultiSelect Data="@Kategoriak" ValueField="Azonosito" TextField="Nev"
+                                Value="@SelectedKategoriak" Class="multi-select"
+                                ValueChanged="@( (List<long> v) => SelectedKategoriakChanged(v) )"
+                                Placeholder="Válassz ki kategóriákat" Filterable="true"
+                                Width="600px" ClearButton="true" AutoClose="false">
+            </TelerikMultiSelect>
+        </div>
         <TelerikButton Class="excel-button" Icon="@IconName.FileExcel" OnClick="@(e => ExcelExport())"></TelerikButton>
     </div>
 
@@ -83,9 +94,9 @@
 
         <TelerikWindow @bind-Visible="@EditWindowIsVisible" Modal="true">
             <WindowTitle>
-                @{ 
+                @{
                     string title = ( EditedDolgozo as IDictionary<string, object> )[ "Nev" ].ToString( );
-                } 
+                }
                 <strong>@title</strong>
             </WindowTitle>
             <WindowContent>
@@ -99,10 +110,60 @@
             </WindowActions>
         </TelerikWindow>
 
+        <TelerikWindow @bind-Visible="@UjKompWindowIsVisible" Modal="true">
+            <WindowTitle>
+                <strong>Új kompetencia</strong>
+            </WindowTitle>
+                
+            <WindowContent>
+                <EditForm Model="@ujKompetenciaModel" OnValidSubmit="@SaveUjKompetencia">
+                    <DataAnnotationsValidator />
+                    <div class="column">
+                        <TelerikComboBox Data="@Kategoriak" Width="250px" Placeholder="Válassz kategóriát!"
+                         ValueField="Azonosito" TextField="Nev" @bind-Value="@ujKompetenciaModel.Kategoria"/>
+                        <ValidationMessage For="@(() => ujKompetenciaModel.Kategoria)" />
+                        
+                        <TelerikTextBox Width="250px" @bind-Value="@ujKompetenciaModel.Nev" Class="uj-nev-textbox"/>
+                        <ValidationMessage For="@(() => ujKompetenciaModel.Nev)"></ValidationMessage>
+                    </div>
+
+                    <div class="popup-window-bottom">
+                        <TelerikButton ButtonType="@ButtonType.Submit" class="button-primary" 
+                                       Icon="save">Mentés</TelerikButton>
+                    </div>
+                </EditForm>                
+            </WindowContent>
+            <WindowActions>
+                <WindowAction Name="Close"></WindowAction>
+            </WindowActions>
+        </TelerikWindow>
+
+        <TelerikWindow @bind-Visible="@UjKompKatWindowIsVisible" Modal="true">
+            <WindowTitle>
+                <strong>Új kompetencia kategória</strong>
+            </WindowTitle>
+            <WindowContent>
+                <EditForm Model="@ujKompKatModel" OnValidSubmit="@SaveUjKompKat">
+                    <DataAnnotationsValidator />
+                    <TelerikTextBox Width="250px" @bind-Value="@ujKompKatModel.Nev" Class="uj-nev-textbox" />
+                    <ValidationMessage For="@(() => ujKompKatModel.Nev)"></ValidationMessage>
+
+                    <div class="popup-window-bottom">
+                        <TelerikButton ButtonType="@ButtonType.Submit" class="button-primary"
+                                       Icon="save">Mentés</TelerikButton>
+                    </div>
+                </EditForm>
+            </WindowContent>
+            <WindowActions>
+                <WindowAction Name="Close"></WindowAction>
+            </WindowActions>
+        </TelerikWindow>
+
     }
 </div>
 
 <style>
+
 
     .kompetencia-grid {
         display: contents !important;
@@ -116,13 +177,30 @@
         height: 56px;
     }
 
+    .two-button-div {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        margin-right: 10px;
+    }
+
+    .half-height-button {
+        height: 47%;
+    }
+
+    .k-multiselect .k-multiselect-wrap {
+        height: 56px;
+    }
+
     .button-primary {
         float: right;
     }
 
-    .multi-select {
+    .header-to-right {
         margin-left: auto;
         margin-right: 10px;
+        display: flex;
+        flex-direction: row;
     }
 
     /*CustomGroupHeader dolgai*/
@@ -216,6 +294,15 @@
         width: 32px;
         height: 32px;
         font-size: 32px;
+    }
+
+    .column {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .uj-nev-textbox {
+        margin-top: 16px;
     }
 
 
