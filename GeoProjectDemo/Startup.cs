@@ -9,6 +9,13 @@ using Microsoft.AspNetCore.Components.Authorization;
 using GeoProjectDemo.Services;
 using Microsoft.JSInterop;
 using GeoProjectDemo.Helpers;
+using BaseClasses;
+using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
+using System.IO;
+using System;
+using Newtonsoft.Json;
+using System.Linq;
 
 namespace GeoProjectDemo
 {
@@ -37,7 +44,9 @@ namespace GeoProjectDemo
             services.AddHttpContextAccessor( );
             services.AddAuthorization( );
             services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>( );
-            
+
+            Globals.Globals.SaveServiceOptions(
+                File.ReadAllText( Path.Combine( Environment.CurrentDirectory, "appsettings.json" ) ) );
 
         }
 
@@ -70,6 +79,7 @@ namespace GeoProjectDemo
                  endpoints.MapBlazorHub( );
                  endpoints.MapFallbackToPage( "/_Host" );
              } );
+
         }
     }
 }
