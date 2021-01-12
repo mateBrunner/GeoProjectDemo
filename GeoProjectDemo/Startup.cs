@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using GeoProjectServiceTeszt;
 using Microsoft.AspNetCore.Server.IIS;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -37,16 +38,34 @@ namespace GeoProjectDemo
             services.AddRazorPages( );
             services.AddTelerikBlazor( );
             services.AddServerSideBlazor( );
-            services.AddSingleton<SessionService>( );
-            services.AddSingleton<KompetenciaService>( );
-            services.AddSingleton<FoglalasService>( );
 
+            //var options = Globals.Globals.SaveServiceOptions(
+            //    File.ReadAllText( Path.Combine( Environment.CurrentDirectory, "appsettings.json" ) ) );
+
+
+            //services.AddTransient<GeoProjectDemo.Services.GeoProjectService>( );
+
+
+            services.AddTransient<GeoProjectServiceClient>( );
+
+
+                //( provider => new GeoProjectDemo.Services.GeoProjectService( ) );
+            //    var client = new GeoProjectDemo.Services.GeoProjectService( options[0] );
+
+            //    return client;
+            //} );
+            
+            
+            services.AddSingleton<SessionService>( );
+            services.AddTransient<KompetenciaService>( );
+            services.AddTransient<FoglalasService>( );
+
+            
             services.AddHttpContextAccessor( );
             services.AddAuthorization( );
             services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>( );
 
-            Globals.Globals.SaveServiceOptions(
-                File.ReadAllText( Path.Combine( Environment.CurrentDirectory, "appsettings.json" ) ) );
+            
 
         }
 

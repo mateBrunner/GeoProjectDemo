@@ -1,4 +1,5 @@
 ﻿using BaseClasses;
+using Geometria.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,8 @@ namespace GeoProjectServiceTeszt
     public partial class GeoProjectServiceClient : System.ServiceModel.ClientBase<GeoProjectServiceTeszt.GeoProjectService>, GeoProjectServiceTeszt.GeoProjectService
     {
 
+
+
         public GeoProjectServiceClient( ServiceOptions options ) :
                 base( GetCustomBinding( ), GetDefaultEndpointAddress( ) )
         {
@@ -18,11 +21,13 @@ namespace GeoProjectServiceTeszt
             this.Endpoint.Name = EndpointConfiguration.BasicHttpBinding_GeoProjectService.ToString( );
 
             var webProxy = new WebProxy( $"{options.ProxyAddress}:{options.ProxyPort}", true );
-            webProxy.Credentials = new NetworkCredential( options.ProxyUsername, options.ProxyPassword );
+            webProxy.Credentials = new NetworkCredential(
+                options.ProxyUsername,
+                Cryptor.Decrypt( options.ProxyPassword ) );
             WebRequest.DefaultWebProxy = webProxy;
 
             ClientCredentials.UserName.UserName = options.Username;
-            ClientCredentials.UserName.Password = options.Password;
+            ClientCredentials.UserName.Password = Cryptor.Decrypt( options.Password );
 
             ConfigureEndpoint( this.Endpoint, this.ClientCredentials );
 
@@ -48,6 +53,7 @@ namespace GeoProjectServiceTeszt
                 htbe.ProxyAuthenticationScheme = AuthenticationSchemes.Basic;
 
                 htbe.UseDefaultWebProxy = false;
+
 
                 return customBinding;
             }

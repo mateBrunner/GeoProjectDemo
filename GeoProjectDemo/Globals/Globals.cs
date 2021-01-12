@@ -15,10 +15,6 @@ namespace GeoProjectDemo.Globals
 
         private static List<ServiceOptions> m_ServiceOptions;
 
-
-
-
-
         private static GeoProjectServiceTeszt.GeoProjectServiceClient m_ProjectServiceTeszt;
 
         public static GeoProjectServiceTeszt.GeoProjectServiceClient ProjectServiceTeszt
@@ -134,7 +130,7 @@ namespace GeoProjectDemo.Globals
         }
 
 
-        public static void SaveServiceOptions(string appSettings)
+        public static List<ServiceOptions> SaveServiceOptions(string appSettings)
         {
             JObject jAppSettings = JObject.Parse( appSettings );
 
@@ -148,6 +144,7 @@ namespace GeoProjectDemo.Globals
             }
 
             m_ServiceOptions = serviceOptions;
+            return m_ServiceOptions;
         }
 
     }

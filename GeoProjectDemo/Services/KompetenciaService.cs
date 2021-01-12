@@ -6,11 +6,19 @@ using System.Threading.Tasks;
 using GeoProjectServiceTeszt;
 using System.Dynamic;
 using BaseClasses;
+using Microsoft.AspNetCore.Components;
 
 namespace GeoProjectDemo.Services
 {
     public class KompetenciaService
     {
+
+        private GeoProjectServiceClient m_GeoProjectService;
+
+        public KompetenciaService(GeoProjectServiceClient service)
+        {
+            m_GeoProjectService = service;
+        }
 
         public async Task<KompetenciaAdatok> GetAdatok( )
         {
