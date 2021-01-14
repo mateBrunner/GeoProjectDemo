@@ -39,22 +39,8 @@ namespace GeoProjectDemo
             services.AddTelerikBlazor( );
             services.AddServerSideBlazor( );
 
-            //var options = Globals.Globals.SaveServiceOptions(
-            //    File.ReadAllText( Path.Combine( Environment.CurrentDirectory, "appsettings.json" ) ) );
-
-
-            //services.AddTransient<GeoProjectDemo.Services.GeoProjectService>( );
-
-
-            services.AddTransient<GeoProjectServiceClient>( );
-
-
-                //( provider => new GeoProjectDemo.Services.GeoProjectService( ) );
-            //    var client = new GeoProjectDemo.Services.GeoProjectService( options[0] );
-
-            //    return client;
-            //} );
-            
+            services.AddTransient<IGPKompetenciaService, GPKompetenciaService>( );
+            services.AddTransient<IGPFoglalasService, GPFoglalasService>( );
             
             services.AddSingleton<SessionService>( );
             services.AddTransient<KompetenciaService>( );

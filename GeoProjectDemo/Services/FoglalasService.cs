@@ -12,22 +12,29 @@ namespace GeoProjectDemo.Services
     public class FoglalasService
     {
 
+        private IGPFoglalasService m_GPService;
+
+        public FoglalasService( IGPFoglalasService service )
+        {
+            m_GPService = service;
+        }
+
         public async Task<FoglalasAdatok> GetAdatok( )
         {
             FoglalasAdatok result = new FoglalasAdatok( );
 
-            var res1 = await Globals.Globals.ProjectServiceTeszt.GetWindowsAuthenticatedUserIdAsync( );
-            var res2 = await Globals.Globals.ProjectServiceTeszt.LoginAsync( "asdf", "asdf", res1.WindowsUserId, res1.WindowsUserId );
-            
-            CallResultGetAllPublicFoglalasok foglalasok =
-                await Globals.Globals.ProjectServiceTeszt.GetAllPublicFoglalasokAsync( res2.Session.SessionId );
+            var res1 = await m_GPService.GetWindowsAuthenticatedUserIdAsync( );
+            var res2 = await m_GPService.LoginAsync( "asdf", "asdf", res1.WindowsUserId, res1.WindowsUserId );
 
-            Dictionary<int, Dolgozok> dolgozokDict = 
-                ( await Globals.Globals.ProjectServiceTeszt.SelectDolgozokRecordsAsync( res2.Session.SessionId, false ) )
+            CallResultGetAllPublicFoglalasok foglalasok =
+                await m_GPService.GetAllPublicFoglalasokAsync( res2.Session.SessionId );
+
+            Dictionary<int, Dolgozok> dolgozokDict =
+                ( await m_GPService.SelectDolgozokRecordsAsync( res2.Session.SessionId, false ) )
                 .Dolgozok.ToDictionary( x => x.Azonosito, x => x );
 
             Dictionary<int, Projektek> projektekDict =
-                ( await Globals.Globals.ProjectServiceTeszt.SelectProjektRecordsAsync( res2.Session.SessionId, true, true ) )
+                ( await m_GPService.SelectProjektRecordsAsync( res2.Session.SessionId, true, true ) )
                 .Projektek.ToDictionary( x => x.Azonosito, x => x );
 
             result.Napok = GetVisibleDays( );
@@ -41,7 +48,8 @@ namespace GeoProjectDemo.Services
 
                 var dolgozoFoglalasok = dolg.Value.NapiFoglalasok;
 
-                foreach ( Nap nap in result.Napok ) {
+                foreach ( Nap nap in result.Napok )
+                {
 
                     NapiFoglalas napiFoglalas = new NapiFoglalas( );
 
@@ -70,7 +78,7 @@ namespace GeoProjectDemo.Services
                         ).ToList( );
 
                     napiFoglalas.CreateToolTipSzoveg( );
-                    current.TryAdd( nap.PropertyNev, napiFoglalas );                    
+                    current.TryAdd( nap.PropertyNev, napiFoglalas );
 
                 }
 

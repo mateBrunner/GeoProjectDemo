@@ -27,7 +27,7 @@ namespace GeoProjectDemo.Globals
 
                 var options = m_ServiceOptions.FirstOrDefault( s => s.ServiceName == "GeoProjectService" );
 
-                m_ProjectServiceTeszt = new GeoProjectServiceTeszt.GeoProjectServiceClient( options );
+                m_ProjectServiceTeszt = new GeoProjectServiceTeszt.GeoProjectServiceClient( null );
 
 
 
@@ -129,23 +129,6 @@ namespace GeoProjectDemo.Globals
             }
         }
 
-
-        public static List<ServiceOptions> SaveServiceOptions(string appSettings)
-        {
-            JObject jAppSettings = JObject.Parse( appSettings );
-
-            List<JToken> results = jAppSettings[ "CustomOptions" ][ "Services" ].Children( ).ToList( );
-
-            List<ServiceOptions> serviceOptions = new List<ServiceOptions>( );
-            foreach ( JToken result in results )
-            {
-                ServiceOptions searchResult = result.ToObject<ServiceOptions>( );
-                serviceOptions.Add( searchResult );
-            }
-
-            m_ServiceOptions = serviceOptions;
-            return m_ServiceOptions;
-        }
 
     }
 }

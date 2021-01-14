@@ -1,11 +1,9 @@
 ﻿using BaseClasses;
 using Geometria.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using GeoProjectDemo.Helpers;
+using Microsoft.Extensions.Configuration;
 using System.Net;
 using System.ServiceModel.Channels;
-using System.Threading.Tasks;
 
 namespace GeoProjectServiceTeszt
 {
@@ -14,20 +12,38 @@ namespace GeoProjectServiceTeszt
 
 
 
-        public GeoProjectServiceClient( ServiceOptions options ) :
+        public GeoProjectServiceClient( IConfiguration config ) :
                 base( GetCustomBinding( ), GetDefaultEndpointAddress( ) )
         {
 
             this.Endpoint.Name = EndpointConfiguration.BasicHttpBinding_GeoProjectService.ToString( );
 
-            var webProxy = new WebProxy( $"{options.ProxyAddress}:{options.ProxyPort}", true );
+            var proxyAddress = SettingsHelper.GetServiceSettings( 
+                config, ServiceNames.GEOPROJECT, ServiceAttributes.PROXY_ADDRESS );
+
+            var proxyPort = SettingsHelper.GetServiceSettings(
+                config, ServiceNames.GEOPROJECT, ServiceAttributes.PROXY_PORT );
+
+            var proxyUsername = SettingsHelper.GetServiceSettings(
+                config, ServiceNames.GEOPROJECT, ServiceAttributes.PROXY_USER );
+
+            var proxyPassword = SettingsHelper.GetServiceSettings(
+                config, ServiceNames.GEOPROJECT, ServiceAttributes.PROXY_PWD );
+
+            var username = SettingsHelper.GetServiceSettings(
+                config, ServiceNames.GEOPROJECT, ServiceAttributes.USERNAME );
+
+            var password = SettingsHelper.GetServiceSettings(
+                config, ServiceNames.GEOPROJECT, ServiceAttributes.PASSWORD );
+
+            var webProxy = new WebProxy( $"{proxyAddress}:{proxyPort}", true );
             webProxy.Credentials = new NetworkCredential(
-                options.ProxyUsername,
-                Cryptor.Decrypt( options.ProxyPassword ) );
+                proxyUsername,
+                Cryptor.Decrypt( proxyPassword ) );
             WebRequest.DefaultWebProxy = webProxy;
 
-            ClientCredentials.UserName.UserName = options.Username;
-            ClientCredentials.UserName.Password = Cryptor.Decrypt( options.Password );
+            ClientCredentials.UserName.UserName = username;
+            ClientCredentials.UserName.Password = Cryptor.Decrypt( password );
 
             ConfigureEndpoint( this.Endpoint, this.ClientCredentials );
 

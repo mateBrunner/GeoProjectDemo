@@ -10412,7 +10412,7 @@ namespace GeoProjectServiceTeszt
         /// <param name="clientCredentials">The client credentials</param>
         static partial void ConfigureEndpoint(System.ServiceModel.Description.ServiceEndpoint serviceEndpoint, System.ServiceModel.Description.ClientCredentials clientCredentials);
         
-        public GeoProjectServiceClient(IConfiguration config) : 
+        public GeoProjectServiceClient( ) : 
                 base(GeoProjectServiceClient.GetDefaultBinding(), GeoProjectServiceClient.GetDefaultEndpointAddress())
         {
             this.Endpoint.Name = EndpointConfiguration.BasicHttpBinding_GeoProjectService.ToString();
